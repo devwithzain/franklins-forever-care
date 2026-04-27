@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+    src: url("../../resources/fonts/PlusJakartaSans-Regular.ttf");
+    font-family: "Plus Jakarta Sans";
+}
+
+body {
+    font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+::-webkit-scrollbar {
+    width: 0px;
+}
