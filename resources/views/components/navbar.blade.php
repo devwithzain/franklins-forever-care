@@ -19,6 +19,7 @@
         </div>
     </div>
     <div class="flex items-center gap-3.5">
+        @if(Auth::user()->role === 'admin')
         <div class="relative" x-data="{ open: false }">
             <button @click="open = !open"
                 class="px-4 py-2 bg-theme-primary text-white rounded-[8px] text-[12.5px] font-bold shadow-md hover:bg-theme-primary-hover transition-all flex items-center gap-2">
@@ -74,6 +75,7 @@
                 </a>
             </div>
         </div>
+        @endif
         <button @click="darkMode = !darkMode"
             class="relative w-[38px] h-[38px] rounded-full border border-theme-border bg-theme-card cursor-pointer flex items-center justify-center hover:bg-theme-hover transition-colors text-theme-muted hover:text-theme-main">
             <svg x-show="!darkMode" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -117,7 +119,7 @@
                         </div>
                     </div>
                 </div>
-                <a href="{{ route('admin.notifications') }}"
+                <a href="{{ Auth::user()->role === 'employee' ? route('employee.notifications') : (Auth::user()->role === 'client' ? route('client.notifications') : route('admin.notifications')) }}"
                     class="px-[18px] py-3 text-center text-[13px] text-theme-primary font-semibold cursor-pointer hover:bg-theme-hover rounded-b-[14px] block">See
                     All Notifications →
                 </a>
@@ -137,7 +139,7 @@
             </div>
             <div x-show="open" @click.outside="open = false" x-transition
                 class="absolute top-[54px] right-0 w-48 bg-theme-card rounded-lg border border-theme-border shadow-lg z-[500]">
-                <a href="{{ route('admin.container.setting.index') }}"
+                <a href="{{ Auth::user()->role === 'employee' ? route('employee.container.setting.index') : (Auth::user()->role === 'client' ? route('client.container.setting.index') : route('admin.container.setting.index')) }}"
                     class="block px-4 py-2 text-sm text-theme-main hover:bg-theme-hover">Profile</a>
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf

@@ -48,6 +48,25 @@ Route::middleware(['auth', 'admin'])->group(function () {
 // Employee routes (only for authenticated employees)
 Route::middleware(['auth', 'employee'])->group(function () {
     Route::get('/employee-dashboard', [EmployeeHomePageController::class, 'index'])->name('employee.dashboard');
+    Route::get('/employee-dashboard/clients', [EmployeeHomePageController::class, 'clients'])->name('employee.clients.index');
+    Route::get('/employee-dashboard/attendance', [EmployeeHomePageController::class, 'attendance'])->name('employee.attendance');
+    Route::get('/employee-dashboard/outdoor', [EmployeeHomePageController::class, 'outdoor'])->name('employee.outdoor');
+    Route::get('/employee-dashboard/requests', [EmployeeHomePageController::class, 'requests'])->name('employee.requests.index');
+    Route::get('/employee-dashboard/notifications', [EmployeeHomePageController::class, 'notifications'])->name('employee.notifications');
+    Route::get('/employee-dashboard/setting', [EmployeeHomePageController::class, 'setting'])->name('employee.container.setting.index');
+    Route::put('/employee-dashboard/setting/{id}', [EmployeeHomePageController::class, 'updateSetting'])->name('employee.container.setting.update');
+    Route::delete('/employee-dashboard/setting/session/{id}', [EmployeeHomePageController::class, 'logoutSession'])->name('employee.setting.logout-session');
+});
+
+// Client routes (only for authenticated clients)
+Route::middleware(['auth', 'client'])->group(function () {
+    Route::get('/client-dashboard', [\App\Http\Controllers\Client\Dashboard\ClientHomePageController::class, 'index'])->name('client.dashboard');
+    Route::get('/client-dashboard/requests', [\App\Http\Controllers\Client\Dashboard\ClientHomePageController::class, 'requests'])->name('client.requests.index');
+    Route::get('/client-dashboard/care-plan', [\App\Http\Controllers\Client\Dashboard\ClientHomePageController::class, 'carePlan'])->name('client.care-plan');
+    Route::get('/client-dashboard/notifications', [\App\Http\Controllers\Client\Dashboard\ClientHomePageController::class, 'notifications'])->name('client.notifications');
+    Route::get('/client-dashboard/setting', [\App\Http\Controllers\Client\Dashboard\ClientHomePageController::class, 'setting'])->name('client.container.setting.index');
+    Route::put('/client-dashboard/setting/{id}', [\App\Http\Controllers\Client\Dashboard\ClientHomePageController::class, 'updateSetting'])->name('client.container.setting.update');
+    Route::delete('/client-dashboard/setting/session/{id}', [\App\Http\Controllers\Client\Dashboard\ClientHomePageController::class, 'logoutSession'])->name('client.setting.logout-session');
 });
 
 require __DIR__ . '/auth.php';

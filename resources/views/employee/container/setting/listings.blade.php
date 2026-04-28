@@ -1,6 +1,6 @@
-@extends('layouts.user')
+@extends('layouts.employee')
 
-@section('client-content')
+@section('employee-content')
     <div class="w-full flex items-center justify-between gap-5">
         <div>
             <div class="text-2xl font-extrabold text-theme-text-main">Account Settings</div>
@@ -14,7 +14,7 @@
                 <div class="px-6 py-5 border-b border-theme-border">
                     <h3 class="text-[15px] font-extrabold text-theme-text-main">Profile Information</h3>
                 </div>
-                <form action="{{ route('client.container.setting.update', Auth::user()->id) }}" method="post"
+                <form action="{{ route('employee.container.setting.update', Auth::user()->id) }}" method="post"
                     class="p-6 space-y-5" enctype="multipart/form-data">
                     @method('PUT')
                     @csrf
@@ -100,7 +100,7 @@
                                 </div>
                             </div>
                             @if(!$session->is_current_device)
-                                <form action="{{ route('client.setting.logout-session', $session->id) }}" method="POST">
+                                <form action="{{ route('employee.setting.logout-session', $session->id) }}" method="POST">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="text-[12px] font-bold text-red-500 hover:underline">Logout</button>
@@ -114,7 +114,7 @@
                 <div class="px-6 py-5 border-b border-theme-border">
                     <h3 class="text-[15px] font-extrabold text-theme-text-main">Change Password</h3>
                 </div>
-                <form action="{{ route('client.container.setting.update', Auth::user()->id) }}" method="post"
+                <form action="{{ route('employee.container.setting.update', Auth::user()->id) }}" method="post"
                     class="p-6 space-y-5">
                     @method('PUT')
                     @csrf

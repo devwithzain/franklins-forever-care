@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
             'employee' => \App\Http\Middleware\EmployeeMiddleware::class,
+            'client' => \App\Http\Middleware\ClientMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
