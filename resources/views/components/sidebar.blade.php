@@ -1,8 +1,8 @@
-<aside class="w-64 bg-white border-r border-slate-200 flex flex-col h-screen flex-shrink-0 z-[100] fixed top-0 left-0">
+<aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
+   class="w-64 bg-theme-card border-r border-theme-border flex flex-col h-screen flex-shrink-0 z-[100] fixed top-0 left-0 transition-transform duration-300">
    <div class="p-6 pb-2">
       <div class="flex items-center gap-3">
-         <div
-            class="w-9 h-9 bg-[#1a3cdc] rounded-[10px] flex items-center justify-center text-white shadow-lg shadow-blue-200">
+         <div class="w-9 h-9 bg-theme-primary rounded-[10px] flex items-center justify-center text-white">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                stroke-linecap="round" stroke-linejoin="round">
                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
@@ -10,8 +10,8 @@
             </svg>
          </div>
          <div class="leading-tight">
-            <div class="text-[15px] font-extrabold text-slate-800 tracking-tight">Franklin's</div>
-            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Forever Care</div>
+            <div class="text-[15px] font-extrabold text-theme-main tracking-tight">Franklin's</div>
+            <div class="text-[10px] font-bold text-theme-muted uppercase tracking-widest">Forever Care</div>
          </div>
       </div>
    </div>
@@ -21,7 +21,7 @@
             <div class="px-3 mb-3 text-[10px] font-extrabold text-slate-400 uppercase tracking-[0.15em]">Main</div>
             <div class="space-y-1">
                <a href="{{ route('admin.dashboard') }}"
-                  class="flex items-center justify-between px-3 py-2.5 rounded-[10px] {{ Request::routeIs('admin.dashboard') ? 'bg-[#1a3cdc] text-white shadow-md shadow-blue-100' : 'text-slate-500 hover:bg-slate-50' }} transition-all group">
+                  class="flex items-center justify-between px-3 py-2.5 rounded-[10px] {{ Request::routeIs('admin.dashboard') ? 'bg-theme-primary text-white' : 'text-theme-muted hover:bg-theme-hover' }} transition-all group">
                   <div class="flex items-center gap-3">
                      <svg
                         class="w-[18px] h-[18px] {{ Request::routeIs('admin.dashboard') ? 'text-white' : 'text-slate-400 group-hover:text-slate-600' }}"
@@ -37,11 +37,11 @@
          <div class="mb-8">
             <div class="px-3 mb-3 text-[10px] font-extrabold text-slate-400 uppercase tracking-[0.15em]">Operations</div>
             <div class="space-y-1">
-               <a href="{{ route('admin.clients') }}"
-                  class="flex items-center justify-between px-3 py-2.5 rounded-[10px] {{ Request::routeIs('admin.clients') ? 'bg-[#1a3cdc] text-white shadow-md' : 'text-slate-500 hover:bg-slate-50' }} transition-all group">
+               <a href="{{ route('admin.clients.index') }}"
+                  class="flex items-center justify-between px-3 py-2.5 rounded-[10px] {{ Request::routeIs('admin.clients.*') ? 'bg-theme-primary text-white shadow-md' : 'text-theme-muted hover:bg-theme-hover' }} transition-all group">
                   <div class="flex items-center gap-3">
                      <svg
-                        class="w-[18px] h-[18px] {{ Request::routeIs('admin.clients') ? 'text-white' : 'text-slate-400 group-hover:text-slate-600' }}"
+                        class="w-[18px] h-[18px] {{ Request::routeIs('admin.clients.*') ? 'text-white' : 'text-slate-400 group-hover:text-slate-600' }}"
                         fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
                         <circle cx="9" cy="7" r="4" />
@@ -51,11 +51,11 @@
                      <span class="text-[13.5px] font-bold">Clients</span>
                   </div>
                </a>
-               <a href="{{ route('admin.employees') }}"
-                  class="flex items-center justify-between px-3 py-2.5 rounded-[10px] {{ Request::routeIs('admin.employees') ? 'bg-[#1a3cdc] text-white shadow-md' : 'text-slate-500 hover:bg-slate-50' }} transition-all group">
+               <a href="{{ route('admin.employees.index') }}"
+                  class="flex items-center justify-between px-3 py-2.5 rounded-[10px] {{ Request::routeIs('admin.employees.*') ? 'bg-theme-primary text-white shadow-md' : 'text-theme-muted hover:bg-theme-hover' }} transition-all group">
                   <div class="flex items-center gap-3">
                      <svg
-                        class="w-[18px] h-[18px] {{ Request::routeIs('admin.employees') ? 'text-white' : 'text-slate-400 group-hover:text-slate-600' }}"
+                        class="w-[18px] h-[18px] {{ Request::routeIs('admin.employees.*') ? 'text-white' : 'text-slate-400 group-hover:text-slate-600' }}"
                         fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                         <circle cx="12" cy="7" r="4" />
@@ -64,7 +64,7 @@
                   </div>
                </a>
                <a href="{{ route('admin.attendance') }}"
-                  class="flex items-center justify-between px-3 py-2.5 rounded-[10px] {{ Request::routeIs('admin.attendance') ? 'bg-[#1a3cdc] text-white shadow-md' : 'text-slate-500 hover:bg-slate-50' }} transition-all group">
+                  class="flex items-center justify-between px-3 py-2.5 rounded-[10px] {{ Request::routeIs('admin.attendance') ? 'bg-theme-primary text-white shadow-md' : 'text-theme-muted hover:bg-theme-hover' }} transition-all group">
                   <div class="flex items-center gap-3">
                      <svg
                         class="w-[18px] h-[18px] {{ Request::routeIs('admin.attendance') ? 'text-white' : 'text-slate-400 group-hover:text-slate-600' }}"
@@ -76,7 +76,7 @@
                   </div>
                </a>
                <a href="{{ route('admin.payments') }}"
-                  class="flex items-center justify-between px-3 py-2.5 rounded-[10px] {{ Request::routeIs('admin.payments') ? 'bg-[#1a3cdc] text-white shadow-md' : 'text-slate-500 hover:bg-slate-50' }} transition-all group">
+                  class="flex items-center justify-between px-3 py-2.5 rounded-[10px] {{ Request::routeIs('admin.payments') ? 'bg-theme-primary text-white shadow-md' : 'text-theme-muted hover:bg-theme-hover' }} transition-all group">
                   <div class="flex items-center gap-3">
                      <svg
                         class="w-[18px] h-[18px] {{ Request::routeIs('admin.payments') ? 'text-white' : 'text-slate-400 group-hover:text-slate-600' }}"
@@ -88,7 +88,7 @@
                   </div>
                </a>
                <a href="{{ route('admin.outdoor') }}"
-                  class="flex items-center justify-between px-3 py-2.5 rounded-[10px] {{ Request::routeIs('admin.outdoor') ? 'bg-[#1a3cdc] text-white shadow-md' : 'text-slate-500 hover:bg-slate-50' }} transition-all group">
+                  class="flex items-center justify-between px-3 py-2.5 rounded-[10px] {{ Request::routeIs('admin.outdoor') ? 'bg-theme-primary text-white shadow-md' : 'text-theme-muted hover:bg-theme-hover' }} transition-all group">
                   <div class="flex items-center gap-3">
                      <svg
                         class="w-[18px] h-[18px] {{ Request::routeIs('admin.outdoor') ? 'text-white' : 'text-slate-400 group-hover:text-slate-600' }}"
@@ -104,11 +104,11 @@
          <div class="mb-8">
             <div class="px-3 mb-3 text-[10px] font-extrabold text-slate-400 uppercase tracking-[0.15em]">Support</div>
             <div class="space-y-1">
-               <a href="{{ route('admin.requests') }}"
-                  class="flex items-center justify-between px-3 py-2.5 rounded-[10px] {{ Request::routeIs('admin.requests') ? 'bg-[#1a3cdc] text-white shadow-md' : 'text-slate-500 hover:bg-slate-50' }} transition-all group">
+               <a href="{{ route('admin.requests.index') }}"
+                  class="flex items-center justify-between px-3 py-2.5 rounded-[10px] {{ Request::routeIs('admin.requests.*') ? 'bg-theme-primary text-white shadow-md' : 'text-theme-muted hover:bg-theme-hover' }} transition-all group">
                   <div class="flex items-center gap-3">
                      <svg
-                        class="w-[18px] h-[18px] {{ Request::routeIs('admin.requests') ? 'text-white' : 'text-slate-400 group-hover:text-slate-600' }}"
+                        class="w-[18px] h-[18px] {{ Request::routeIs('admin.requests.*') ? 'text-white' : 'text-slate-400 group-hover:text-slate-600' }}"
                         fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                      </svg>
@@ -117,7 +117,7 @@
                   <span class="px-1.5 py-0.5 rounded-full bg-red-100 text-red-600 text-[9px] font-extrabold">12</span>
                </a>
                <a href="{{ route('admin.complaints') }}"
-                  class="flex items-center justify-between px-3 py-2.5 rounded-[10px] {{ Request::routeIs('admin.complaints') ? 'bg-[#1a3cdc] text-white shadow-md' : 'text-slate-500 hover:bg-slate-50' }} transition-all group">
+                  class="flex items-center justify-between px-3 py-2.5 rounded-[10px] {{ Request::routeIs('admin.complaints') ? 'bg-theme-primary text-white shadow-md' : 'text-theme-muted hover:bg-theme-hover' }} transition-all group">
                   <div class="flex items-center gap-3">
                      <svg
                         class="w-[18px] h-[18px] {{ Request::routeIs('admin.complaints') ? 'text-white' : 'text-slate-400 group-hover:text-slate-600' }}"
@@ -137,7 +137,7 @@
             <div class="px-3 mb-3 text-[10px] font-extrabold text-slate-400 uppercase tracking-[0.15em]">System</div>
             <div class="space-y-1">
                <a href="{{ route('admin.notifications') }}"
-                  class="flex items-center justify-between px-3 py-2.5 rounded-[10px] {{ Request::routeIs('admin.notifications') ? 'bg-[#1a3cdc] text-white shadow-md' : 'text-slate-500 hover:bg-slate-50' }} transition-all group">
+                  class="flex items-center justify-between px-3 py-2.5 rounded-[10px] {{ Request::routeIs('admin.notifications') ? 'bg-theme-primary text-white shadow-md' : 'text-theme-muted hover:bg-theme-hover' }} transition-all group">
                   <div class="flex items-center gap-3">
                      <svg
                         class="w-[18px] h-[18px] {{ Request::routeIs('admin.notifications') ? 'text-white' : 'text-slate-400 group-hover:text-slate-600' }}"
@@ -149,7 +149,7 @@
                   </div>
                </a>
                <a href="{{ route('admin.reports') }}"
-                  class="flex items-center justify-between px-3 py-2.5 rounded-[10px] {{ Request::routeIs('admin.reports') ? 'bg-[#1a3cdc] text-white shadow-md' : 'text-slate-500 hover:bg-slate-50' }} transition-all group">
+                  class="flex items-center justify-between px-3 py-2.5 rounded-[10px] {{ Request::routeIs('admin.reports') ? 'bg-theme-primary text-white shadow-md' : 'text-theme-muted hover:bg-theme-hover' }} transition-all group">
                   <div class="flex items-center gap-3">
                      <svg
                         class="w-[18px] h-[18px] {{ Request::routeIs('admin.reports') ? 'text-white' : 'text-slate-400 group-hover:text-slate-600' }}"
@@ -161,7 +161,7 @@
                   </div>
                </a>
                <a href="{{ route('admin.container.setting.index') }}"
-                  class="flex items-center justify-between px-3 py-2.5 rounded-[10px] {{ Request::routeIs('admin.container.setting.index') ? 'bg-[#1a3cdc] text-white shadow-md' : 'text-slate-500 hover:bg-slate-50' }} transition-all group">
+                  class="flex items-center justify-between px-3 py-2.5 rounded-[10px] {{ Request::routeIs('admin.container.setting.index') ? 'bg-theme-primary text-white shadow-md' : 'text-theme-muted hover:bg-theme-hover' }} transition-all group">
                   <div class="flex items-center gap-3">
                      <svg
                         class="w-[18px] h-[18px] {{ Request::routeIs('admin.container.setting.index') ? 'text-white' : 'text-slate-400 group-hover:text-slate-600' }}"
@@ -194,7 +194,7 @@
          </div>
       @endif
    </div>
-   <div class="p-4 border-t border-slate-100">
+   <div class="px-4 py-2">
       <form method="POST" action="{{ route('logout') }}">
          @csrf
          <button type="submit"

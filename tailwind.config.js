@@ -10,7 +10,25 @@ export default {
     ],
 
     theme: {
-        extend: {},
+        extend: {
+            colors: {
+                theme: {
+                    bg: "var(--theme-bg-main)",
+                    card: "var(--theme-bg-card)",
+                    hover: "var(--theme-bg-hover)",
+                    border: "var(--theme-border)",
+                    text: {
+                        main: "var(--theme-text-main)",
+                        muted: "var(--theme-text-muted)",
+                    },
+                    primary: {
+                        DEFAULT: "var(--theme-primary)",
+                        hover: "var(--theme-primary-hover)",
+                        light: "var(--theme-primary-light)",
+                    },
+                },
+            },
+        },
     },
 
     plugins: [forms],

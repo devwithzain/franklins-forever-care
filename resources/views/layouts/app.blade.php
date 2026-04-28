@@ -1,5 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" x-data="{ 
+    darkMode: localStorage.getItem('darkMode') === 'true', 
+    sidebarOpen: localStorage.getItem('sidebarOpen') !== 'false' 
+}" x-init="
+    $watch('darkMode', val => localStorage.setItem('darkMode', val)); 
+    $watch('sidebarOpen', val => localStorage.setItem('sidebarOpen', val));
+" :class="{ 'dark': darkMode }">
 
 <head>
     <meta charset="UTF-8">
@@ -12,10 +18,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 </head>
 
-<body class="bg-[#f0f2f8] text-[#1e293b]">
+<body class="bg-theme-bg text-theme-text-main transition-colors duration-300">
     <div class="flex min-h-screen overflow-y-auto">
         <x-sidebar />
-        <div class="flex flex-col flex-1 overflow-hidden ml-64">
+        <div :class="sidebarOpen ? 'ml-64' : 'ml-0'"
+            class="flex flex-col flex-1 overflow-hidden transition-all duration-300">
             <x-navbar />
             <main class="flex-1 overflow-y-auto p-7 pt-[91px]">
                 @yield('content')

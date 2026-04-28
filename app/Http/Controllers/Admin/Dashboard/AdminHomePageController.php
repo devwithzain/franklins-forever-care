@@ -15,10 +15,6 @@ class AdminHomePageController extends Controller
          'users' => $users,
       ]);
    }
-   public function clients()
-   {
-      return view('admin.container.clients.index');
-   }
    public function employees()
    {
       return view('admin.container.employees.index');

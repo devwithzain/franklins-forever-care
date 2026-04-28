@@ -3,7 +3,10 @@
 use Illuminate\Support\Facades\Route;
 
 // Admin Controllers
+use App\Http\Controllers\Admin\Client\ClientController;
 use App\Http\Controllers\Admin\Setting\SettingController;
+use App\Http\Controllers\Admin\Employee\EmployeeController;
+use App\Http\Controllers\Admin\Request\ClientRequestController;
 use App\Http\Controllers\Admin\Dashboard\AdminHomePageController;
 
 // Employee Controllers
@@ -23,12 +26,15 @@ Route::post('/', [AuthenticatedSessionController::class, 'store'])
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/dashboard', [AdminHomePageController::class, 'index'])->name('admin.dashboard');
 
-    Route::get('/dashboard/clients', [AdminHomePageController::class, 'clients'])->name('admin.clients');
-    Route::get('/dashboard/employees', [AdminHomePageController::class, 'employees'])->name('admin.employees');
+    Route::resource('/dashboard/clients', ClientController::class)->names('admin.clients');
+
+    Route::resource('/dashboard/employees', EmployeeController::class)->names('admin.employees');
     Route::get('/dashboard/attendance', [AdminHomePageController::class, 'attendance'])->name('admin.attendance');
     Route::get('/dashboard/payments', [AdminHomePageController::class, 'payments'])->name('admin.payments');
     Route::get('/dashboard/outdoor', [AdminHomePageController::class, 'outdoor'])->name('admin.outdoor');
-    Route::get('/dashboard/requests', [AdminHomePageController::class, 'requests'])->name('admin.requests');
+
+    Route::get('/dashboard/requests', [ClientRequestController::class, 'index'])->name('admin.requests.index');
+    Route::put('/dashboard/requests/{clientRequest}/status', [ClientRequestController::class, 'updateStatus'])->name('admin.requests.updateStatus');
     Route::get('/dashboard/complaints', [AdminHomePageController::class, 'complaints'])->name('admin.complaints');
     Route::get('/dashboard/notifications', [AdminHomePageController::class, 'notifications'])->name('admin.notifications');
     Route::get('/dashboard/reports', [AdminHomePageController::class, 'reports'])->name('admin.reports');

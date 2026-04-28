@@ -35,4 +35,14 @@ class User extends Authenticatable
             'two_factor_expires_at' => 'datetime',
         ];
     }
+
+    public function client()
+    {
+        return $this->hasOne(Client::class);
+    }
+
+    public function employee()
+    {
+        return $this->hasOne(Employee::class);
+    }
 }

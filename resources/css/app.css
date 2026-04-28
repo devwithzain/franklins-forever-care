@@ -2,6 +2,34 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+    :root {
+        --theme-bg-main: #f0f2f8;
+        --theme-bg-card: #ffffff;
+        --theme-bg-hover: #f8fafc;
+        --theme-border: #e2e8f0;
+        --theme-text-main: #1e293b;
+        --theme-text-muted: #64748b;
+
+        --theme-primary: #1a3cdc;
+        --theme-primary-hover: #1230b0;
+        --theme-primary-light: #eef2ff;
+    }
+
+    .dark {
+        --theme-bg-main: #0f172a;
+        --theme-bg-card: #1e293b;
+        --theme-bg-hover: #334155;
+        --theme-border: #334155;
+        --theme-text-main: #f8fafc;
+        --theme-text-muted: #94a3b8;
+
+        --theme-primary: #3b82f6; /* Lighter blue for dark mode contrast */
+        --theme-primary-hover: #2563eb;
+        --theme-primary-light: rgba(59, 130, 246, 0.1);
+    }
+}
+
 @font-face {
     src: url("../../resources/fonts/PlusJakartaSans-Regular.ttf");
     font-family: "Plus Jakarta Sans";
