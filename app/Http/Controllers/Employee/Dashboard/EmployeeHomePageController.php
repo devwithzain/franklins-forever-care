@@ -252,7 +252,8 @@ class EmployeeHomePageController extends Controller
 
     public function notifications()
     {
-        return view('employee.container.notifications.index');
+        $broadcasts = \App\Models\Broadcast::with('sender')->latest()->paginate(10);
+        return view('employee.container.notifications.index', compact('broadcasts'));
     }
 
     public function setting()

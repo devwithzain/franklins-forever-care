@@ -29,11 +29,12 @@
                </h2>
             </div>
             <div>
-               <form class="space-y-3">
+               <form class="space-y-3" action="{{ route('newsletter.subscribe') }}" method="POST">
+                  @csrf
                   <div class="flex bg-white rounded-lg overflow-hidden">
-                     <input type="email" placeholder="Enter Your Email"
+                     <input type="email" name="email" placeholder="Enter Your Email" required
                         class="flex-1 px-5 outline-none border-none text-black focus:border-none focus:outline-none focus:ring-0">
-                     <button
+                     <button type="submit"
                         class="bg-[#F0BB4C] hover:bg-[#7E80B0] transition px-8 text-black hover:text-white font-medium flex items-center justify-center gap-2 h-14 m-1 rounded-lg cursor-pointer">
                         Subscribe
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
@@ -44,10 +45,10 @@
                      </button>
                   </div>
                   <label class="flex items-center gap-3 text-white text-sm">
-                     <input type="checkbox" class="rounded border-white cursor-pointer">
+                     <input type="checkbox" required class="rounded border-white cursor-pointer">
                      <span>
                         I understand and agree to the
-                        <a href="#" class="underline">
+                        <a href="{{ route('terms-conditions') }}" class="underline">
                            Terms & Conditions
                         </a>
                      </span>

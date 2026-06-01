@@ -7,18 +7,19 @@
          <p class="text-[#666666] mb-8">
             Our booking process is simple confidential and flexible to fit your schedule
          </p>
-         <form class="space-y-5">
+         <form class="space-y-5" action="{{ route('contact.submit') }}" method="POST">
+            @csrf
             <div class="grid grid-cols-2 gap-5">
-               <input type="text" placeholder="Full Name"
+               <input type="text" name="name" placeholder="Full Name" required
                   class="w-full h-14 rounded-xl border-0 bg-white px-5 outline-none focus:ring-2 focus:ring-[#DFA15B]">
-               <input type="email" placeholder="Email"
+               <input type="email" name="email" placeholder="Email" required
                   class="w-full h-14 rounded-xl border-0 bg-white px-5 outline-none focus:ring-2 focus:ring-[#DFA15B]">
-               <input type="text" placeholder="Phone"
+               <input type="text" name="phone" placeholder="Phone"
                   class="w-full h-14 rounded-xl border-0 bg-white px-5 outline-none focus:ring-2 focus:ring-[#DFA15B]">
-               <input type="text" placeholder="Subject"
+               <input type="text" name="subject" placeholder="Subject" required
                   class="w-full h-14 rounded-xl border-0 bg-white px-5 outline-none focus:ring-2 focus:ring-[#DFA15B]">
             </div>
-            <textarea rows="5" placeholder="Write Your Message"
+            <textarea rows="5" name="message" placeholder="Write Your Message" required
                class="w-full rounded-xl border-0 bg-white p-5 outline-none resize-none focus:ring-2 focus:ring-[#DFA15B]"></textarea>
             <button type="submit"
                class="bg-[#E8B06B] hover:bg-[#d89a50] transition text-black font-medium px-8 h-14 rounded-xl flex items-center gap-2">

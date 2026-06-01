@@ -15,31 +15,31 @@
                     <button class="text-[12px] font-bold text-[#1a3cdc] hover:underline">Mark all as read</button>
                 </div>
                 <div class="divide-y divide-theme-border">
-                    <div class="p-6 flex gap-4 hover:bg-theme-bg transition-colors">
-                        <div
-                            class="w-10 h-10 rounded-full bg-red-50 text-red-600 flex items-center justify-center flex-shrink-0">
-                            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                                stroke-width="2">
-                                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-                            </svg>
-                        </div>
-                        <div class="flex-1">
-                            <div class="flex items-center justify-between mb-1">
-                                <span class="text-[14px] font-bold text-theme-text-main">Critical Alert: Agent
-                                    Unassigned</span>
-                                <span class="text-[11px] text-theme-text-muted">2 mins ago</span>
+                    @forelse($broadcasts ?? [] as $broadcast)
+                        <div class="p-6 flex gap-4 hover:bg-theme-bg transition-colors">
+                            <div
+                                class="w-10 h-10 rounded-full bg-red-50 text-red-600 flex items-center justify-center flex-shrink-0">
+                                <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                                </svg>
                             </div>
-                            <p class="text-[13px] text-theme-text-muted leading-relaxed">Arthur Morgan's agent (James
-                                Wilson) is
-                                currently offline during a scheduled 24/7 care window.</p>
-                            <div class="mt-3 flex gap-2">
-                                <button class="px-3 py-1 bg-[#1a3cdc] text-white rounded-[6px] text-[11px] font-bold">Assign
-                                    Now</button>
-                                <button
-                                    class="px-3 py-1 bg-theme-hover text-theme-text-main rounded-[6px] text-[11px] font-bold">Ignore</button>
+                            <div class="flex-1">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-[14px] font-bold text-theme-text-main">{{ ucfirst($broadcast->audience) }} Notification</span>
+                                    <span class="text-[11px] text-theme-text-muted">{{ $broadcast->created_at->diffForHumans() }}</span>
+                                </div>
+                                <p class="text-[13px] text-theme-text-muted leading-relaxed">{{ $broadcast->message }}</p>
+                                <div class="mt-3 flex gap-2">
+                                    <span class="text-[10px] text-theme-text-muted">From: {{ $broadcast->sender?->name ?? 'Admin' }}</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    @empty
+                        <div class="p-6 text-center text-theme-text-muted">
+                            <p>No notifications at this time.</p>
+                        </div>
+                    @endforelse
                 </div>
             </div>
         </div>
