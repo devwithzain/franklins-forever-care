@@ -1,5 +1,5 @@
 @extends('layouts.employee')
-
+@section('title', 'Account Settings')
 @section('employee-content')
     <div class="w-full flex items-center justify-between gap-5">
         <div>
@@ -8,7 +8,7 @@
             </div>
         </div>
     </div>
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 my-5">
+    <div class="grid sm:grid-cols-1 xm:grid-cols-1 grid-cols-3 gap-5 my-5">
         <div class="lg:col-span-2 space-y-5">
             <div class="bg-theme-card rounded-[14px] border border-theme-border shadow-sm overflow-hidden">
                 <div class="px-6 py-5 border-b border-theme-border">

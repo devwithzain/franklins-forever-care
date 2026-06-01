@@ -1,198 +1,140 @@
 @extends('layouts.user')
-
+@section('title', 'My Request')
 @section('client-content')
-    <div class="w-full flex items-center justify-between gap-5">
+<div x-data="{ showRequestModal: false }">
+    <div class="w-full flex items-center justify-between gap-5 mb-8">
         <div>
-            <div class="text-2xl font-extrabold text-theme-text-main">Client Requests</div>
-            <div class="text-[13px] text-theme-text-muted mt-1">Review and approve service changes, outdoor requests, and cancellations.</div>
+            <div class="text-2xl font-extrabold text-theme-main">My Requests</div>
+            <div class="text-[13px] text-theme-muted mt-1">Track your service bookings and submit support requests.</div>
         </div>
+        <button @click="showRequestModal = true" 
+            class="px-5 py-2.5 bg-theme-primary text-white rounded-[10px] text-[13px] font-bold shadow-md hover:bg-theme-primary-hover transition-all flex items-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+            </svg>
+            New Support Request
+        </button>
     </div>
 
     @if (session('success'))
-        <div class="bg-green-100 border border-green-200 text-green-700 px-4 py-3 rounded-[10px] my-4 text-sm font-bold">
+        <div class="bg-green-100 border border-green-200 text-green-700 px-4 py-3 rounded-[10px] my-4 text-sm font-bold shadow-sm">
             {{ session('success') }}
         </div>
     @endif
-
-    <div class="flex gap-4 my-5 overflow-x-auto pb-2 custom-scrollbar">
-        <a href="{{ route('admin.requests.index', ['tab' => 'all']) }}" 
-            class="px-5 py-2.5 rounded-[10px] text-[13px] font-bold whitespace-nowrap transition-all {{ $activeTab === 'all' ? 'bg-theme-primary text-white shadow-md' : 'bg-theme-card border border-theme-border text-theme-text-muted hover:bg-theme-hover' }}">
-            All Requests ({{ $stats['total'] }})
-        </a>
-        <a href="{{ route('admin.requests.index', ['tab' => 'Change Agent']) }}" 
-            class="px-5 py-2.5 rounded-[10px] text-[13px] font-bold whitespace-nowrap transition-all {{ $activeTab === 'Change Agent' ? 'bg-theme-primary text-white shadow-md' : 'bg-theme-card border border-theme-border text-theme-text-muted hover:bg-theme-hover' }}">
-            Change Agent ({{ $stats['change_agent'] }})
-        </a>
-        <a href="{{ route('admin.requests.index', ['tab' => 'Outdoor Access']) }}" 
-            class="px-5 py-2.5 rounded-[10px] text-[13px] font-bold whitespace-nowrap transition-all {{ $activeTab === 'Outdoor Access' ? 'bg-theme-primary text-white shadow-md' : 'bg-theme-card border border-theme-border text-theme-text-muted hover:bg-theme-hover' }}">
-            Outdoor Access ({{ $stats['outdoor'] }})
-        </a>
-        <a href="{{ route('admin.requests.index', ['tab' => 'Cancellations']) }}" 
-            class="px-5 py-2.5 rounded-[10px] text-[13px] font-bold whitespace-nowrap transition-all {{ $activeTab === 'Cancellations' ? 'bg-theme-primary text-white shadow-md' : 'bg-theme-card border border-theme-border text-theme-text-muted hover:bg-theme-hover' }}">
-            Cancellations ({{ $stats['cancellations'] }})
-        </a>
-    </div>
+    @if ($errors->any())
+        <div class="bg-red-100 border border-red-200 text-red-700 px-4 py-3 rounded-[10px] my-4 text-sm font-bold shadow-sm">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
     <div class="bg-theme-card rounded-[14px] border border-theme-border overflow-hidden shadow-sm">
         <div class="overflow-x-auto">
             <table class="w-full text-left">
-                <thead class="bg-theme-hover border-b border-theme-border">
+                <thead class="bg-theme-bg border-b border-theme-border">
                     <tr>
-                        <th class="px-6 py-3 text-[10.5px] font-bold text-theme-text-muted uppercase tracking-widest">Client</th>
-                        <th class="px-6 py-3 text-[10.5px] font-bold text-theme-text-muted uppercase tracking-widest">Type</th>
-                        <th class="px-6 py-3 text-[10.5px] font-bold text-theme-text-muted uppercase tracking-widest">Date Submitted</th>
-                        <th class="px-6 py-3 text-[10.5px] font-bold text-theme-text-muted uppercase tracking-widest">Priority</th>
-                        <th class="px-6 py-3 text-[10.5px] font-bold text-theme-text-muted uppercase tracking-widest">Status</th>
-                        <th class="px-6 py-3 text-[10.5px] font-bold text-theme-text-muted uppercase tracking-widest text-right">Actions</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-theme-border">
-                    @forelse ($requests as $requestData)
-                        <tr class="hover:bg-theme-hover transition-colors" x-data="{ showModal: false }">
-                            <td class="px-6 py-4">
-                                <div class="text-[13.5px] font-bold text-theme-text-main">{{ $requestData->client->user->name }}</div>
-                                <div class="text-[11px] text-theme-text-muted">{{ $requestData->request_custom_id }}</div>
-                            </td>
-                            <td class="px-6 py-4">
-                                @php
-                                    $typeClasses = [
-                                        'Change Agent' => 'bg-amber-50 text-amber-600',
-                                        'Outdoor Access' => 'bg-green-50 text-green-600',
-                                        'Cancellations' => 'bg-red-50 text-red-600',
-                                    ];
-                                    $typeClass = $typeClasses[$requestData->type] ?? 'bg-blue-50 text-blue-600';
-                                @endphp
-                                <span class="px-2 py-0.5 rounded {{ $typeClass }} text-[11px] font-bold">{{ $requestData->type }}</span>
-                            </td>
-                            <td class="px-6 py-4 text-[13px] text-theme-text-main">{{ $requestData->created_at->format('M d, Y') }}</td>
-                            <td class="px-6 py-4">
-                                @php
-                                    $priorityClasses = [
-                                        'High' => 'bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400',
-                                        'Medium' => 'bg-amber-50 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400',
-                                        'Low' => 'bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400',
-                                    ];
-                                    $priorityClass = $priorityClasses[$requestData->priority] ?? 'bg-theme-bg text-theme-text-muted';
-                                @endphp
-                                <span class="px-2 py-0.5 rounded {{ $priorityClass }} text-[11px] font-bold">{{ $requestData->priority }}</span>
-                            </td>
-                            <td class="px-6 py-4">
-                                @php
-                                    $statusClasses = [
-                                        'Pending' => 'bg-theme-hover text-theme-text-muted',
-                                        'Approved' => 'bg-green-100 text-green-600',
-                                        'Rejected' => 'bg-red-100 text-red-600',
-                                    ];
-                                    $statusClass = $statusClasses[$requestData->status] ?? 'bg-theme-hover text-theme-text-muted';
-                                @endphp
-                                <span class="px-2 py-0.5 rounded-full {{ $statusClass }} text-[10.5px] font-bold">{{ $requestData->status }}</span>
-                            </td>
-                            <td class="px-6 py-4 text-right">
-                                <div class="flex items-center justify-end gap-2">
-                                    <button @click="showModal = true" class="px-3 py-1.5 bg-theme-primary-light text-theme-primary rounded-lg text-[11px] font-bold transition-all">View</button>
-                                    
-                                    @if ($requestData->status === 'Pending')
-                                        <form action="{{ route('admin.requests.updateStatus', $requestData->id) }}" method="POST" class="inline">
-                                            @csrf
-                                            @method('PUT')
-                                            <input type="hidden" name="status" value="Approved">
-                                            <button type="submit" class="px-3 py-1.5 bg-green-500 text-white rounded-lg text-[11px] font-bold hover:bg-green-600 shadow-sm transition-all">Approve</button>
-                                        </form>
-                                        <form action="{{ route('admin.requests.updateStatus', $requestData->id) }}" method="POST" class="inline">
-                                            @csrf
-                                            @method('PUT')
-                                            <input type="hidden" name="status" value="Rejected">
-                                            <button type="submit" class="px-3 py-1.5 bg-theme-card border border-theme-border text-theme-text-main rounded-lg text-[11px] font-bold hover:bg-theme-hover shadow-sm transition-all">Reject</button>
-                                        </form>
-                                    @endif
-                                </div>
-                            </td>
-
-                            <!-- Request Details Modal -->
-                            <template x-teleport="body">
-                                <div x-show="showModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm" style="display: none;">
-                                    <div x-show="showModal" @click.outside="showModal = false" x-transition.opacity.duration.300ms
-                                        class="bg-theme-card rounded-[20px] shadow-2xl w-full max-w-lg overflow-hidden border border-theme-border">
-                                        <div class="px-6 py-5 border-b border-theme-border flex items-center justify-between bg-theme-hover">
-                                            <div>
-                                                <h3 class="text-[16px] font-extrabold text-theme-text-main">Request Details</h3>
-                                                <p class="text-[12px] text-theme-text-muted">{{ $requestData->request_custom_id }}</p>
-                                            </div>
-                                            <button @click="showModal = false" class="w-8 h-8 rounded-full bg-theme-border text-theme-text-muted flex items-center justify-center hover:bg-theme-hover transition-colors">
-                                                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
-                                            </button>
-                                        </div>
-                                        <div class="p-6 space-y-5">
-                                            <div class="flex items-center gap-4 p-4 bg-theme-hover rounded-[12px] border border-theme-border">
-                                                <div class="w-12 h-12 rounded-full bg-theme-primary-light text-theme-primary flex items-center justify-center font-extrabold text-[14px]">
-                                                    {{ strtoupper(substr($requestData->client->user->name, 0, 2)) }}
-                                                </div>
-                                                <div>
-                                                    <div class="text-[14px] font-bold text-theme-text-main">{{ $requestData->client->user->name }}</div>
-                                                    <div class="text-[12px] text-theme-text-muted">{{ $requestData->client->user->email }}</div>
-                                                </div>
-                                            </div>
-                                            
-                                            <div class="grid grid-cols-2 gap-4">
-                                                <div>
-                                                    <div class="text-[11px] font-bold text-theme-text-muted uppercase tracking-widest mb-1">Request Type</div>
-                                                    <span class="px-2 py-0.5 rounded {{ $typeClass }} text-[12px] font-bold">{{ $requestData->type }}</span>
-                                                </div>
-                                                <div>
-                                                    <div class="text-[11px] font-bold text-theme-text-muted uppercase tracking-widest mb-1">Priority</div>
-                                                    <span class="px-2 py-0.5 rounded {{ $priorityClass }} text-[12px] font-bold">{{ $requestData->priority }}</span>
-                                                </div>
-                                                <div>
-                                                    <div class="text-[11px] font-bold text-theme-text-muted uppercase tracking-widest mb-1">Date Submitted</div>
-                                                    <div class="text-[13px] font-bold text-theme-text-main">{{ $requestData->created_at->format('M d, Y h:i A') }}</div>
-                                                </div>
-                                                <div>
-                                                    <div class="text-[11px] font-bold text-theme-text-muted uppercase tracking-widest mb-1">Current Status</div>
-                                                    <span class="px-2 py-0.5 rounded-full {{ $statusClass }} text-[12px] font-bold">{{ $requestData->status }}</span>
-                                                </div>
-                                            </div>
-
-                                            <div>
-                                                <div class="text-[11px] font-bold text-theme-text-muted uppercase tracking-widest mb-2">Description / Reason</div>
-                                                <div class="p-4 bg-theme-hover border border-theme-border rounded-[12px] text-[13px] text-theme-text-main leading-relaxed">
-                                                    {{ $requestData->description ?? 'No description provided by the client.' }}
-                                                </div>
-                                            </div>
-                                        </div>
-                                        @if ($requestData->status === 'Pending')
-                                            <div class="px-6 py-4 border-t border-theme-border bg-theme-hover flex items-center justify-end gap-3">
-                                                <form action="{{ route('admin.requests.updateStatus', $requestData->id) }}" method="POST" class="inline">
-                                                    @csrf
-                                                    @method('PUT')
-                                                    <input type="hidden" name="status" value="Rejected">
-                                                    <button type="submit" class="px-5 py-2.5 bg-theme-card border border-theme-border text-theme-text-main rounded-[10px] text-[13px] font-bold hover:bg-theme-hover transition-all shadow-sm">Reject Request</button>
-                                                </form>
-                                                <form action="{{ route('admin.requests.updateStatus', $requestData->id) }}" method="POST" class="inline">
-                                                    @csrf
-                                                    @method('PUT')
-                                                    <input type="hidden" name="status" value="Approved">
-                                                    <button type="submit" class="px-5 py-2.5 bg-green-500 text-white rounded-[10px] text-[13px] font-bold shadow-md hover:bg-green-600 transition-all">Approve Request</button>
-                                                </form>
-                                            </div>
-                                        @endif
-                                    </div>
-                                </div>
-                            </template>
+                        <th class="px-6 py-3 text-[10.5px] font-bold text-theme-muted uppercase tracking-widest">Request ID</th>
+                        <th class="px-6 py-3 text-[10.5px] font-bold text-theme-muted uppercase tracking-widest">Request Type</th>
+                            <th class="px-6 py-3 text-[10.5px] font-bold text-theme-muted uppercase tracking-widest">Priority</th>
+                            <th class="px-6 py-3 text-[10.5px] font-bold text-theme-muted uppercase tracking-widest text-left">Description</th>
+                            <th class="px-6 py-3 text-[10.5px] font-bold text-theme-muted uppercase tracking-widest">Submitted On</th>
+                            <th class="px-6 py-3 text-[10.5px] font-bold text-theme-muted uppercase tracking-widest">Status</th>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="6" class="px-6 py-10 text-center text-theme-text-muted">
-                                No requests found.
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
+                    </thead>
+                    <tbody class="divide-y divide-theme-border text-theme-main">
+                        @forelse ($data as $request)
+                            <tr class="hover:bg-theme-hover transition-colors">
+                                <td class="px-6 py-4 text-[12px] font-bold text-theme-muted uppercase">{{ $request->request_custom_id }}</td>
+                                <td class="px-6 py-4 font-bold text-[13.5px]">{{ $request->type }}</td>
+                                <td class="px-6 py-4">
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase {{ $request->priority === 'High' ? 'bg-red-50 text-red-600 border border-red-100' : ($request->priority === 'Medium' ? 'bg-amber-50 text-amber-600 border border-amber-100' : 'bg-green-50 text-green-600 border border-green-100') }}">
+                                        {{ $request->priority }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-[13px] max-w-[280px] truncate" title="{{ $request->description }}">{{ $request->description }}</td>
+                                <td class="px-6 py-4 text-[13px] text-theme-muted">{{ $request->created_at->format('M d, Y') }}</td>
+                                <td class="px-6 py-4">
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase {{ $request->status === 'Approved' ? 'bg-green-100 text-green-600' : ($request->status === 'Pending' ? 'bg-amber-100 text-amber-600' : 'bg-red-100 text-red-600') }}">
+                                        {{ $request->status }}
+                                    </span>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="6" class="px-6 py-10 text-center text-theme-muted">No support requests found.</td></tr>
+                        @endforelse
+                    </tbody>
             </table>
         </div>
-        @if ($requests->hasPages())
+        @if ($data->hasPages())
             <div class="px-6 py-4 border-t border-theme-border">
-                {{ $requests->links() }}
+                {{ $data->links() }}
             </div>
         @endif
     </div>
+
+    <!-- Modal backdrop -->
+    <div x-show="showRequestModal" 
+        class="fixed inset-0 bg-black/50 z-[999] flex items-center justify-center p-4 transition-opacity"
+        x-cloak>
+        
+        <!-- Modal content -->
+        <div @click.away="showRequestModal = false" 
+            class="bg-theme-card border border-theme-border w-full max-w-lg rounded-[18px] shadow-2xl overflow-hidden transform transition-all duration-300">
+            
+            <div class="px-6 py-5 border-b border-theme-border flex items-center justify-between">
+                <h3 class="text-[17px] font-extrabold text-theme-main">Submit Support Request</h3>
+                <button @click="showRequestModal = false" class="text-theme-muted hover:text-theme-main transition-colors">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <form action="{{ route('client.requests.store') }}" method="POST" class="p-6 space-y-5">
+                @csrf
+                <div>
+                    <label for="type" class="block text-[12.5px] font-bold text-theme-muted uppercase tracking-wider mb-2">Request Type</label>
+                    <select name="type" id="type" required
+                        class="w-full bg-theme-bg border border-theme-border text-theme-main px-4 py-3 rounded-[10px] text-[13.5px] font-bold focus:outline-none focus:border-theme-primary transition-all">
+                        <option value="General Support">General Support / Enquiry</option>
+                        <option value="Change Agent">Request PCA Agent Change</option>
+                        <option value="Outdoor Access">Request Outdoor Activity Access</option>
+                        <option value="Cancellations">Cancel Package / Subscription</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="priority" class="block text-[12.5px] font-bold text-theme-muted uppercase tracking-wider mb-2">Priority Level</label>
+                    <select name="priority" id="priority" required
+                        class="w-full bg-theme-bg border border-theme-border text-theme-main px-4 py-3 rounded-[10px] text-[13.5px] font-bold focus:outline-none focus:border-theme-primary transition-all">
+                        <option value="Low">Low (Response in 48h)</option>
+                        <option value="Medium" selected>Medium (Response in 24h)</option>
+                        <option value="High">High (Immediate Action Required)</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="description" class="block text-[12.5px] font-bold text-theme-muted uppercase tracking-wider mb-2">Detailed Description</label>
+                    <textarea name="description" id="description" rows="5" required minlength="10"
+                        placeholder="Please provide details about your request so our care team can assist you perfectly..."
+                        class="w-full bg-theme-bg border border-theme-border text-theme-main px-4 py-3 rounded-[10px] text-[13.5px] focus:outline-none focus:border-theme-primary transition-all placeholder-slate-400"></textarea>
+                </div>
+                
+                <div class="flex items-center gap-3 pt-3">
+                    <button type="button" @click="showRequestModal = false"
+                        class="flex-1 py-3 bg-theme-bg border border-theme-border text-theme-main rounded-[10px] text-[13.5px] font-bold hover:bg-theme-hover transition-colors">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                        class="flex-1 py-3 bg-theme-primary text-white rounded-[10px] text-[13.5px] font-bold shadow-md hover:bg-theme-primary-hover transition-colors">
+                        Submit Request
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 @endsection

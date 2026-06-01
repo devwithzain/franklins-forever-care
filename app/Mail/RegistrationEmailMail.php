@@ -33,7 +33,7 @@ class RegistrationEmailMail extends Mailable
    public function content(): Content
    {
       return new Content(
-         view: 'email.registrationemail',
+         view: 'emails.registrationemail',
          with: [
             'name' => $this->name,
             'email' => $this->email,

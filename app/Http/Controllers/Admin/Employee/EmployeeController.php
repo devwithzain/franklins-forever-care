@@ -2,28 +2,34 @@
 
 namespace App\Http\Controllers\Admin\Employee;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-
-use App\Models\Employee;
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
+use App\Models\Employee;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use App\Http\Controllers\Controller;
 
 class EmployeeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $employees = Employee::with(['user', 'clients'])->latest()->paginate(10);
-        
+        $activeTab = $request->query('tab', 'active');
+
         $stats = [
             'total' => Employee::count(),
             'active' => Employee::where('status', 'Active')->count(),
-            'available' => Employee::where('status', 'Active')->count(), // For now same as active
+            'available' => Employee::where('status', 'Active')->count(),
             'on_leave' => Employee::where('status', 'On Leave')->count(),
+            'pending_apps' => \App\Models\CareerApplication::where('status', 'pending')->count(),
         ];
 
-        return view('admin.container.employees.index', compact('employees', 'stats'));
+        if ($activeTab === 'applications') {
+            $applications = \App\Models\CareerApplication::with('user')->latest()->paginate(10);
+            return view('admin.container.employees.index', compact('applications', 'stats', 'activeTab'));
+        }
+
+        $employees = Employee::with(['user', 'clients'])->latest()->paginate(10);
+        return view('admin.container.employees.index', compact('employees', 'stats', 'activeTab'));
     }
 
     public function create()
@@ -87,11 +93,58 @@ class EmployeeController extends Controller
             ]);
 
             $employee->update($request->only([
-                'phone', 'ssn', 'region', 'type', 'status'
+                'phone',
+                'ssn',
+                'region',
+                'type',
+                'status'
             ]));
         });
 
         return redirect()->route('admin.employees.index')->with('success', 'Agent updated successfully.');
+    }
+
+    public function approveApplication($id)
+    {
+        $application = \App\Models\CareerApplication::findOrFail($id);
+        
+        DB::transaction(function () use ($application) {
+            $application->update(['status' => 'approved']);
+            
+            $user = $application->user;
+            
+            if (!$user) {
+                // Check if user already exists with this email
+                $user = \App\Models\User::where('email', $application->email)->first();
+                
+                if (!$user) {
+                    $user = \App\Models\User::create([
+                        'name' => $application->full_name,
+                        'email' => $application->email,
+                        'password' => \Illuminate\Support\Facades\Hash::make(\Illuminate\Support\Str::random(10)),
+                        'role' => 'employee'
+                    ]);
+                }
+                
+                // Update application with user_id
+                $application->update(['user_id' => $user->id]);
+            }
+
+            $user->update(['role' => 'employee']);
+            
+            Employee::firstOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'agent_custom_id' => 'PCA-' . rand(1000, 9999),
+                    'phone' => $application->phone,
+                    'region' => $application->city . ', ' . $application->state,
+                    'type' => 'Full-time',
+                    'status' => 'Active',
+                ]
+            );
+        });
+
+        return redirect()->route('admin.employees.index', ['tab' => 'applications'])->with('success', 'Application approved and PCA agent created.');
     }
 
     public function destroy(Employee $employee)

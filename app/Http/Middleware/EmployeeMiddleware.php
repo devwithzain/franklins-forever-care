@@ -10,10 +10,10 @@ class EmployeeMiddleware
 {
     public function handle(Request $request, Closure $next)
     {
-        if (Auth::check() && Auth::user()->role === 'employee') {
+        if (Auth::check() && (Auth::user()->role === 'employee' || Auth::user()->role === 'user')) {
             return $next($request);
         }
 
-        abort(403, 'Unauthorized. Employee access required.');
+        return redirect()->route('login')->with('error', 'Unauthorized. Employee or Candidate access required.');
     }
 }

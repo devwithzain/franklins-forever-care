@@ -11,30 +11,211 @@ class EmployeeHomePageController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $clients = User::where('role', 'client')->orWhere('role', 'user')->count();
+        $employeeRecord = \App\Models\Employee::where('user_id', $user->id)->first();
+        $application = \App\Models\CareerApplication::where('user_id', $user->id)->latest()->first();
+
+        // 1. Auto-check-in if logged in (ensure single record per day)
+        $todayAttendance = null;
+        if ($employeeRecord) {
+            $today = \Carbon\Carbon::today();
+            $exists = \App\Models\Attendance::where('employee_id', $employeeRecord->id)
+                ->whereDate('check_in', $today->toDateString())
+                ->exists();
+
+            if ($exists) {
+                $todayAttendance = \App\Models\Attendance::where('employee_id', $employeeRecord->id)
+                    ->whereDate('check_in', $today->toDateString())
+                    ->first();
+            } else {
+                $todayAttendance = \App\Models\Attendance::create([
+                    'employee_id' => $employeeRecord->id,
+                    'check_in' => now(),
+                    'status' => 'Present',
+                    'note' => 'Automatic dashboard check-in'
+                ]);
+            }
+        }
+
+        // 2. Fetch weekly logs with detailed information
+        $weeklyAttendance = [];
+        if ($employeeRecord) {
+            $startOfWeek = \Carbon\Carbon::now()->startOfWeek();
+            $endOfWeek = \Carbon\Carbon::now()->endOfWeek();
+
+            $weeklyLogs = \App\Models\Attendance::where('employee_id', $employeeRecord->id)
+                ->whereBetween('check_in', [$startOfWeek, $endOfWeek])
+                ->get()
+                ->keyBy(function ($item) {
+                    return \Carbon\Carbon::parse($item->check_in)->format('N');
+                });
+
+            $dayNames = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
+            $currentDayOfWeek = \Carbon\Carbon::now()->dayOfWeekIso;
+
+            for ($i = 1; $i <= 7; $i++) {
+                $dayName = $dayNames[$i - 1];
+                if (isset($weeklyLogs[$i])) {
+                    $log = $weeklyLogs[$i];
+                    $checkInTime = \Carbon\Carbon::parse($log->check_in);
+                    $checkOutTime = $log->check_out ? \Carbon\Carbon::parse($log->check_out) : null;
+                    $duration = $checkOutTime
+                        ? $checkOutTime->diffInMinutes($checkInTime)
+                        : null;
+                    $weeklyAttendance[] = [
+                        'day' => $dayName,
+                        'status' => $log->status,
+                        'check_in_time' => $checkInTime->format('h:i A'),
+                        'check_out_time' => $checkOutTime ? $checkOutTime->format('h:i A') : '-',
+                        'duration' => $duration ? $this->formatDuration($duration) : '-',
+                        'note' => $log->note,
+                    ];
+                } else {
+                    if ($i < $currentDayOfWeek) {
+                        $weeklyAttendance[] = [
+                            'day' => $dayName,
+                            'status' => 'Absent',
+                            'check_in_time' => '-',
+                            'check_out_time' => '-',
+                            'duration' => '-',
+                            'note' => '',
+                        ];
+                    } else {
+                        $weeklyAttendance[] = [
+                            'day' => $dayName,
+                            'status' => 'OFF',
+                            'check_in_time' => '-',
+                            'check_out_time' => '-',
+                            'duration' => '-',
+                            'note' => '',
+                        ];
+                    }
+                }
+            }
+        } else {
+            foreach (['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'] as $dayName) {
+                $weeklyAttendance[] = [
+                    'day' => $dayName,
+                    'status' => 'OFF',
+                    'check_in_time' => '-',
+                    'check_out_time' => '-',
+                    'duration' => '-',
+                    'note' => '',
+                ];
+            }
+        }
+
+        // 3. Fetch recent requests/activity from assigned clients
+        $recentActivity = [];
+        if ($employeeRecord) {
+            $recentActivity = \App\Models\ClientRequest::whereHas('client', function ($q) use ($user) {
+                $q->where('agent_id', $user->id);
+            })
+                ->with('client.user')
+                ->latest()
+                ->take(5)
+                ->get()
+                ->map(function ($item) {
+                    return [
+                        'id' => $item->id,
+                        'client_name' => $item->client?->user?->name ?? 'Unknown Client',
+                        'request_type' => $item->type,
+                        'status' => $item->status,
+                        'description' => $item->description ?? 'No description',
+                        'created_at' => $item->created_at->diffForHumans(),
+                        'created_date' => $item->created_at->format('M d, Y'),
+                        'created_time' => $item->created_at->format('H:i'),
+                        'image' => $item->client?->user?->image ?? null,
+                    ];
+                });
+        }
+
+        $stats = [
+            'total_clients' => \App\Models\Client::where('agent_id', $user->id)->count(),
+            'total_requests' => \App\Models\ClientRequest::whereHas('client', function ($q) use ($user) {
+                $q->where('agent_id', $user->id);
+            })->count(),
+            'active_cases' => \App\Models\Client::where('agent_id', $user->id)->where('status', 'Active')->count(),
+        ];
 
         return view('employee.container.home.dashboard', [
             'title' => 'Employee Dashboard - Franklin\'s Forever Care',
             'user' => $user,
-            'clients' => $clients,
+            'employeeRecord' => $employeeRecord,
+            'application' => $application,
+            'stats' => $stats,
+            'weeklyAttendance' => $weeklyAttendance,
+            'recentActivity' => $recentActivity,
+            'todayAttendance' => $todayAttendance,
+            'currentDateTime' => \Carbon\Carbon::now(),
         ]);
+    }
+
+    private function formatDuration($minutes)
+    {
+        $hours = floor($minutes / 60);
+        $mins = $minutes % 60;
+
+        if ($hours > 0) {
+            return "{$hours}h {$mins}m";
+        }
+        return "{$mins}m";
     }
 
     public function clients()
     {
-        $clients = \App\Models\Client::with(['user', 'agent'])->where('agent_id', Auth::id())->latest()->paginate(10);
+        $user = Auth::user();
+        $clients = \App\Models\Client::with(['user.serviceBookings'])->where('agent_id', $user->id)->latest()->paginate(10);
+
         $stats = [
-            'total' => \App\Models\Client::where('agent_id', Auth::id())->count(),
-            'active_plans' => \App\Models\Client::where('agent_id', Auth::id())->where('status', 'Active')->count(),
-            'pending_assignment' => 0,
-            'critical_cases' => \App\Models\Client::where('agent_id', Auth::id())->where('status', 'Critical')->count(),
+            'total' => \App\Models\Client::where('agent_id', $user->id)->count(),
+            'active_plans' => \App\Models\Client::where('agent_id', $user->id)->where('status', 'Active')->count(),
+            'critical_cases' => \App\Models\Client::where('agent_id', $user->id)->where('status', 'Critical')->count(),
         ];
+
         return view('employee.container.clients.index', compact('clients', 'stats'));
     }
 
     public function attendance()
     {
-        return view('employee.container.attendance.index');
+        $user = Auth::user();
+        $employeeRecord = \App\Models\Employee::where('user_id', $user->id)->first();
+
+        if (!$employeeRecord) {
+            return view('employee.container.attendance.index', [
+                'presentToday' => 0,
+                'lateToday' => 0,
+                'absentToday' => 1,
+                'onLeaveCount' => 0,
+                'attendances' => collect(),
+            ]);
+        }
+
+        $today = \Carbon\Carbon::today();
+        $attendanceToday = \App\Models\Attendance::where('employee_id', $employeeRecord->id)
+            ->whereDate('check_in', $today)
+            ->first();
+
+        $presentToday = $attendanceToday ? 1 : 0;
+        $lateToday = 0;
+        if ($attendanceToday) {
+            $checkIn = \Carbon\Carbon::parse($attendanceToday->check_in);
+            $lateThreshold = \Carbon\Carbon::today()->setTime(9, 15);
+            $lateToday = $checkIn->greaterThan($lateThreshold) ? 1 : 0;
+        }
+
+        $onLeaveCount = \App\Models\Attendance::where('employee_id', $employeeRecord->id)
+            ->where('status', 'On Leave')
+            ->whereMonth('check_in', \Carbon\Carbon::now()->month)
+            ->count();
+
+        $absentToday = $presentToday ? 0 : 1;
+
+        $attendances = \App\Models\Attendance::where('employee_id', $employeeRecord->id)
+            ->whereBetween('check_in', [\Carbon\Carbon::now()->startOfMonth(), \Carbon\Carbon::now()->endOfMonth()])
+            ->orderBy('check_in', 'desc')
+            ->get();
+
+        return view('employee.container.attendance.index', compact('presentToday', 'lateToday', 'absentToday', 'onLeaveCount', 'attendances'));
     }
 
     public function outdoor()
@@ -44,18 +225,26 @@ class EmployeeHomePageController extends Controller
 
     public function requests(\Illuminate\Http\Request $request)
     {
-        $query = \App\Models\ClientRequest::with(['client.user'])->latest();
+        $user = Auth::user();
+        $query = \App\Models\ClientRequest::with(['client.user'])
+            ->whereHas('client', function ($q) use ($user) {
+                $q->where('agent_id', $user->id);
+            })
+            ->latest();
+
         $activeTab = $request->query('tab', 'all');
         if ($activeTab !== 'all') {
             $query->where('type', $activeTab);
         }
         $requests = $query->paginate(10)->appends(['tab' => $activeTab]);
-        
+
         $stats = [
-            'total' => \App\Models\ClientRequest::count(),
-            'change_agent' => \App\Models\ClientRequest::where('type', 'Change Agent')->count(),
-            'outdoor' => \App\Models\ClientRequest::where('type', 'Outdoor Access')->count(),
-            'cancellations' => \App\Models\ClientRequest::where('type', 'Cancellations')->count(),
+            'total' => \App\Models\ClientRequest::whereHas('client', function ($q) use ($user) {
+                $q->where('agent_id', $user->id);
+            })->count(),
+            'change_agent' => \App\Models\ClientRequest::where('type', 'Change Agent')->whereHas('client', function ($q) use ($user) {
+                $q->where('agent_id', $user->id);
+            })->count(),
         ];
 
         return view('employee.container.requests.index', compact('requests', 'stats', 'activeTab'));
@@ -96,7 +285,7 @@ class EmployeeHomePageController extends Controller
             if ($user->id !== Auth::id()) {
                 abort(403);
             }
-            
+
             $validatedData = $request->validate([
                 'name' => 'nullable|string|max:255',
                 'email' => 'nullable|email|unique:users,email,' . $user->id,
@@ -144,5 +333,31 @@ class EmployeeHomePageController extends Controller
     {
         \Illuminate\Support\Facades\DB::table('sessions')->where('id', $id)->where('user_id', Auth::id())->delete();
         return back()->with('success', 'Session terminated successfully.');
+    }
+
+    public function updateRequestStatus(\Illuminate\Http\Request $request, \App\Models\ClientRequest $clientRequest)
+    {
+        $user = Auth::user();
+
+        // Ensure the request belongs to a client assigned to this employee
+        if ($clientRequest->client->agent_id !== $user->id) {
+            abort(403, 'Unauthorized access.');
+        }
+
+        // Restrict updates to only Care-related/General/Outdoor requests
+        $allowedTypes = ['General Support', 'Outdoor Access'];
+        if (!in_array($clientRequest->type, $allowedTypes)) {
+            return redirect()->back()->with('error', 'Only administrative staff can update status for ' . $clientRequest->type . ' requests.');
+        }
+
+        $request->validate([
+            'status' => 'required|in:Approved,Rejected',
+        ]);
+
+        $clientRequest->update([
+            'status' => $request->status,
+        ]);
+
+        return redirect()->route('employee.requests.index')->with('success', 'Request status updated successfully!');
     }
 }

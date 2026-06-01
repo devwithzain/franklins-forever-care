@@ -1,15 +1,13 @@
 <nav :class="sidebarOpen ? 'left-64' : 'left-0'"
     class="flex items-center justify-between bg-theme-card px-7 border-b border-theme-border z-[90] flex-shrink-0 h-[64px] fixed top-0 right-0 transition-all duration-300">
     <div class="flex items-center gap-4">
-        <button @click="sidebarOpen = !sidebarOpen"
-            class="text-theme-muted hover:text-theme-main focus:outline-none">
+        <button @click="sidebarOpen = !sidebarOpen" class="text-theme-muted hover:text-theme-main focus:outline-none">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16">
                 </path>
             </svg>
         </button>
-        <div
-            class="hidden md:flex items-center bg-theme-bg border border-theme-border rounded-md px-4 w-80 gap-2">
+        <div class="hidden md:flex items-center bg-theme-bg border border-theme-border rounded-md px-4 w-80 gap-2">
             <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="#94a3b8" stroke-width="2">
                 <circle cx="11" cy="11" r="8" />
                 <path d="m21 21-4.35-4.35" />
@@ -19,63 +17,6 @@
         </div>
     </div>
     <div class="flex items-center gap-3.5">
-        @if(Auth::user()->role === 'admin')
-        <div class="relative" x-data="{ open: false }">
-            <button @click="open = !open"
-                class="px-4 py-2 bg-theme-primary text-white rounded-[8px] text-[12.5px] font-bold shadow-md hover:bg-theme-primary-hover transition-all flex items-center gap-2">
-                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                    <line x1="12" y1="5" x2="12" y2="19" />
-                    <line x1="5" y1="12" x2="19" y2="12" />
-                </svg>
-                Quick Add
-                <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                    <path d="m6 9 6 6 6-6" />
-                </svg>
-            </button>
-            <div x-show="open" @click.outside="open = false" x-transition
-                class="absolute top-[48px] right-0 w-56 bg-theme-card rounded-xl border border-theme-border shadow-xl z-[600] overflow-hidden">
-                <a href="{{ route('admin.clients.create') }}"
-                    class="flex items-center gap-3 px-4 py-2.5 text-[13px] text-theme-main hover:bg-theme-hover transition-colors">
-                    <div class="w-8 h-8 rounded-lg bg-blue-50 text-[#1a3cdc] flex items-center justify-center">
-                        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                            stroke-width="2">
-                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                            <circle cx="8.5" cy="7" r="4" />
-                            <line x1="20" y1="8" x2="20" y2="14" />
-                            <line x1="17" y1="11" x2="23" y2="11" />
-                        </svg>
-                    </div>
-                    Add New Client
-                </a>
-                <a href="{{ route('admin.employees.create') }}"
-                    class="flex items-center gap-3 px-4 py-2.5 text-[13px] text-theme-main hover:bg-theme-hover transition-colors border-t border-theme-border">
-                    <div class="w-8 h-8 rounded-lg bg-green-50 text-green-600 flex items-center justify-center">
-                        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                            stroke-width="2">
-                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                            <circle cx="9" cy="7" r="4" />
-                            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                        </svg>
-                    </div>
-                    Add New Agent
-                </a>
-                <a href="#"
-                    class="flex items-center gap-3 px-4 py-2.5 text-[13px] text-theme-main hover:bg-theme-hover transition-colors border-t border-theme-border">
-                    <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
-                        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                            stroke-width="2">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                            <polyline points="14 2 14 8 20 8" />
-                            <line x1="12" y1="18" x2="12" y2="12" />
-                            <line x1="9" y1="15" x2="15" y2="15" />
-                        </svg>
-                    </div>
-                    Create Request
-                </a>
-            </div>
-        </div>
-        @endif
         <button @click="darkMode = !darkMode"
             class="relative w-[38px] h-[38px] rounded-full border border-theme-border bg-theme-card cursor-pointer flex items-center justify-center hover:bg-theme-hover transition-colors text-theme-muted hover:text-theme-main">
             <svg x-show="!darkMode" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

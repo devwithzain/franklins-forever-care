@@ -2,6 +2,64 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+    src: url("../../resources/fonts/PlusJakartaSans-Regular.ttf");
+    font-family: "PlusJakartaSans";
+}
+
+@font-face {
+    src: url("../../resources/fonts/DMSerifDisplay-Regular.ttf");
+    font-family: "DMSerifDisplay";
+}
+
+@font-face {
+    src: url("../../resources/fonts/Inter-Regular.ttf");
+    font-family: "Inter";
+}
+
+body {
+    font-family: "PlusJakartaSans";
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: #7e80b0;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #6b6da3;
+}
+
+.custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #7e80b0 transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 2px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #7e80b0;
+    visibility: hidden;
+}
+
+.custom-scrollbar:hover::-webkit-scrollbar-thumb {
+    visibility: visible;
+}
+
+.scrollbar-visible::-webkit-scrollbar-thumb {
+    visibility: visible !important;
+}
+
 @layer base {
     :root {
         --theme-bg-main: #f0f2f8;
@@ -30,15 +88,72 @@
     }
 }
 
-@font-face {
-    src: url("../../resources/fonts/PlusJakartaSans-Regular.ttf");
-    font-family: "Plus Jakarta Sans";
+@layer utilities {
+    .plusJakartaans {
+        font-family: "PlusJakartaSans";
+    }
+    .inter {
+        font-family: "Inter";
+    }
+    .dmserif {
+        font-family: "DMSerifDisplay";
+    }
+    .padding-x {
+        @apply xxl:px-[100px] xl:px-[50px] lg:px-[42px] md:px-[35px] sm:px-[20px] xm:px-[20px];
+    }
+    .padding-y {
+        @apply xxl:py-[100px] xl:py-[50px] lg:py-[42px] md:py-[35px] sm:py-[20px] xm:py-[20px];
+    }
+    .heading {
+        @apply xxl:text-[50px] xl:text-[44px] lg:text-[42px] md:text-[40px] sm:text-[35px] xm:text-[30px];
+    }
+    .subHeading {
+        @apply xxl:text-[32px] xl:text-[28px] lg:text-[28px] ml:text-[28px] md:text-[28px] sm:text-[28px] xm:text-[26px];
+    }
+    .paragraph {
+        @apply xxl:text-[18px] xl:text-[17px] lg:text-[17px] md:text-[16px] sm:text-[16px] xm:text-[15px];
+    }
+    .smallParagraph {
+        @apply xxl:text-[15px] xl:text-[14px] lg:text-[14px] md:text-[13px] sm:text-[13px] xm:text-[12px];
+    }
 }
 
-body {
-    font-family: "Plus Jakarta Sans", sans-serif;
+.testimonial-swiper .swiper-pagination-bullet {
+    background-color: transparent;
+    border: 2px solid #000;
+    opacity: 1;
+    width: 10px;
+    height: 10px;
 }
 
-::-webkit-scrollbar {
-    width: 0px;
+.testimonial-swiper .swiper-pagination-bullet-active {
+    background-color: #e7b36a;
+    border-color: #e7b36a;
+}
+
+@keyframes marquee {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+.animate-marquee {
+    animation: marquee 25s linear infinite;
+}
+
+.blogSwiper .swiper-pagination-bullet {
+    width: 10px;
+    height: 10px;
+    background: #d1d5db;
+    opacity: 1;
+}
+
+.blogSwiper .swiper-pagination-bullet-active {
+    width: 30px;
+    border-radius: 999px;
+    background: #c98312;
 }

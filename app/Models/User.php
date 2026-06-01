@@ -19,7 +19,8 @@ class User extends Authenticatable
         'image',
         'two_factor_enabled',
         'two_factor_code',
-        'two_factor_expires_at'
+        'two_factor_expires_at',
+        'stripe_customer_id'
     ];
     protected $hidden = [
         'password',
@@ -44,5 +45,10 @@ class User extends Authenticatable
     public function employee()
     {
         return $this->hasOne(Employee::class);
+    }
+
+    public function serviceBookings()
+    {
+        return $this->hasMany(ServiceBooking::class);
     }
 }

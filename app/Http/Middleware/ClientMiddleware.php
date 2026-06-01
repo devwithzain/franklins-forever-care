@@ -14,6 +14,6 @@ class ClientMiddleware
             return $next($request);
         }
 
-        abort(403, 'Unauthorized. Client access required.');
+        return redirect()->route('login')->with('error', 'Unauthorized. Client access required.');
     }
 }

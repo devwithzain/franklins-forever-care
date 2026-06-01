@@ -11,7 +11,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>{{ $title ?? "Franklin's Forever Care" }}</title>
+    <title>@yield('title') - Franklin's Forever Care</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
@@ -19,7 +19,7 @@
 </head>
 
 <body class="bg-theme-bg text-theme-text-main transition-colors duration-300">
-    <div class="flex min-h-screen overflow-y-auto">
+    <div class="flex min-h-screen">
         <x-sidebar />
         <div :class="sidebarOpen ? 'ml-64' : 'ml-0'"
             class="flex flex-col flex-1 overflow-hidden transition-all duration-300">

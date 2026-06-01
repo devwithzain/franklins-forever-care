@@ -1,5 +1,5 @@
 @extends('layouts.admin')
-
+@section('title', 'Clients')
 @section('admin-content')
     <div class="w-full flex items-center justify-between gap-5 mb-5">
         <div>
@@ -7,21 +7,14 @@
             <div class="text-[13px] text-theme-text-muted mt-1">Manage client profiles, service plans, and active
                 assignments.</div>
         </div>
-        <a href="{{ route('admin.clients.create') }}"
-            class="px-5 py-2.5 bg-theme-primary text-white rounded-[10px] text-[13px] font-bold shadow-md hover:bg-theme-primary-hover transition-all flex items-center gap-2">
-            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                <line x1="12" y1="5" x2="12" y2="19" />
-                <line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
-            Add New Client
-        </a>
+
     </div>
     @if (session('success'))
         <div class="bg-green-100 border border-green-200 text-green-700 px-4 py-3 rounded-[10px] mb-5 text-sm font-bold">
             {{ session('success') }}
         </div>
     @endif
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-5">
+    <div class="grid sm:grid-cols-1 xm:grid-cols-1 grid-cols-4 gap-5 mb-5">
         <div class="bg-theme-card text-theme-text-main rounded-[14px] p-5 border border-theme-border shadow-sm">
             <div class="text-theme-text-muted text-[12px] font-bold uppercase tracking-widest mb-1">Total Clients</div>
             <div class="text-2xl font-extrabold text-theme-text-main">{{ $stats['total'] }}</div>
@@ -57,13 +50,6 @@
             <div class="flex items-center gap-3">
                 <input type="text" placeholder="Search clients..."
                     class="w-60 bg-theme-bg border border-theme-border rounded-[8px] px-4 py-2 text-[12.5px] text-theme-text-main placeholder:text-theme-text-muted outline-none focus:border-theme-primary">
-                <select
-                    class="w-40 bg-theme-card border border-theme-primary text-theme-primary rounded-[8px] px-3 py-2 text-[12px] font-medium outline-none cursor-pointer">
-                    <option>All Regions</option>
-                    <option>Austin</option>
-                    <option>Houston</option>
-                    <option>Dallas</option>
-                </select>
             </div>
         </div>
         <div class="overflow-x-auto">

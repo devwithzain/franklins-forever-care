@@ -1,5 +1,5 @@
 @extends('layouts.admin')
-
+@section('title', 'Dashboard')
 @section('admin-content')
     <div class="w-full flex items-center justify-between gap-5">
         <div>
@@ -17,7 +17,7 @@
                 New Client</a>
         </div>
     </div>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 my-5">
+    <div class="grid sm:grid-cols-1 xm:grid-cols-1 grid-cols-4 gap-5 my-5">
         <a href="{{ route('admin.clients.index') }}"
             class="bg-theme-card rounded-[14px] p-5 border border-theme-border shadow-sm hover:shadow-md transition-shadow group">
             <div
@@ -30,9 +30,9 @@
                 </svg>
             </div>
             <div class="text-theme-text-muted text-[12.5px] font-medium uppercase tracking-wide">Total Clients</div>
-            <div class="text-2xl font-extrabold text-theme-text-main mt-1">125</div>
+            <div class="text-2xl font-extrabold text-theme-text-main mt-1">{{ $stats['total_clients'] }}</div>
             <div class="mt-3 flex items-center">
-                <span class="px-2 py-0.5 rounded-full bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400 text-[10.5px] font-bold">↑ 12% this month</span>
+                <span class="px-2 py-0.5 rounded-full bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400 text-[10.5px] font-bold">↑ {{ $stats['client_growth'] }}% total growth</span>
             </div>
         </a>
         <a href="{{ route('admin.employees.index') }}"
@@ -45,12 +45,12 @@
                 </svg>
             </div>
             <div class="text-theme-text-muted text-[12.5px] font-medium uppercase tracking-wide">Specialists (PCA)</div>
-            <div class="text-2xl font-extrabold text-theme-text-main mt-1">38</div>
+            <div class="text-2xl font-extrabold text-theme-text-main mt-1">{{ $stats['specialists'] }}</div>
             <div class="mt-3 flex items-center">
-                <span class="px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-[10.5px] font-bold">10 Active Duty</span>
+                <span class="px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-[10.5px] font-bold">{{ $stats['active_duty'] }} Active Duty</span>
             </div>
         </a>
-        <a href="{{ route('admin.requests.index') }}"
+        <a href="{{ route('admin.employees.index') }}"
             class="bg-theme-primary rounded-[14px] p-5 shadow-lg relative overflow-hidden text-white hover:bg-theme-primary-hover transition-colors group">
             <div
                 class="w-10 h-10 rounded-[10px] bg-white/20 flex items-center justify-center text-white mb-5 group-hover:bg-white group-hover:text-[#1a3cdc] transition-colors">
@@ -59,10 +59,10 @@
                     <path d="M12 8v4m0 4h.01" />
                 </svg>
             </div>
-            <div class="text-white/70 text-[12.5px] font-medium uppercase tracking-wide">Pending Requests</div>
-            <div class="text-2xl font-extrabold text-white mt-1">12</div>
+            <div class="text-white/70 text-[12.5px] font-medium uppercase tracking-wide">Pending Apps & Bookings</div>
+            <div class="text-2xl font-extrabold text-white mt-1">{{ $stats['pending_requests'] + $stats['pending_applications'] }}</div>
             <div class="mt-3 flex items-center">
-                <span class="px-2 py-0.5 rounded-full bg-white/20 text-white text-[10.5px] font-bold">Urgent attention</span>
+                <span class="px-2 py-0.5 rounded-full bg-white/20 text-white text-[10.5px] font-bold">{{ $stats['pending_applications'] }} New Career Submissions</span>
             </div>
             <div class="absolute -right-5 -bottom-5 w-24 h-24 bg-white/10 rounded-full"></div>
         </a>
@@ -76,38 +76,33 @@
                 </svg>
             </div>
             <div class="text-theme-text-muted text-[12.5px] font-medium uppercase tracking-wide">Monthly Revenue</div>
-            <div class="text-2xl font-extrabold text-theme-text-main mt-1">$48K</div>
+            <div class="text-2xl font-extrabold text-theme-text-main mt-1">${{ number_format($stats['monthly_revenue'] / 1000, 1) }}K</div>
             <div class="mt-3 flex items-center">
-                <span class="px-2 py-0.5 rounded-full bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400 text-[10.5px] font-bold">↑ 8% vs last month</span>
+                <span class="px-2 py-0.5 rounded-full bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400 text-[10.5px] font-bold">This month</span>
             </div>
         </a>
     </div>
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        <div class="lg:col-span-2">
+    <div class="grid sm:grid-cols-1 xm:grid-cols-1 grid-cols-3 gap-5">
+        <div class="col-span-2">
             <div class="bg-theme-card rounded-[14px] border border-theme-border shadow-sm mb-5">
                 <div class="px-6 py-5 border-b border-theme-border flex items-center justify-between">
                     <h3 class="text-[15px] font-extrabold text-theme-text-main">Recent Client Activities</h3>
                     <a href="{{ route('admin.clients.index') }}" class="text-[12px] font-bold text-theme-primary hover:underline">View All →</a>
                 </div>
                 <div class="divide-y divide-theme-border">
+                    @forelse($recentActivities as $activity)
                     <div class="px-6 py-4 flex items-start gap-4">
                         <div
                             class="w-9 h-9 rounded-full bg-theme-primary-light text-theme-primary flex items-center justify-center font-bold text-[12px]">
-                            AM</div>
+                            {{ strtoupper(substr($activity->patient_name, 0, 2)) }}</div>
                         <div>
-                            <div class="text-[13.5px] text-theme-text-main"><b>Arthur Morgan</b> <span class="text-theme-text-muted">completed therapy session</span></div>
-                            <div class="text-[11.5px] text-theme-text-muted mt-1">2 hours ago</div>
+                            <div class="text-[13.5px] text-theme-text-main"><b>{{ $activity->patient_name }}</b> <span class="text-theme-text-muted">booked {{ $activity->service->title }} ({{ $activity->plan_type }})</span></div>
+                            <div class="text-[11.5px] text-theme-text-muted mt-1">{{ $activity->created_at->diffForHumans() }}</div>
                         </div>
                     </div>
-                    <div class="px-6 py-4 flex items-start gap-4">
-                        <div
-                            class="w-9 h-9 rounded-full bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 flex items-center justify-center font-bold text-[12px]">
-                            SJ</div>
-                        <div>
-                            <div class="text-[13.5px] text-theme-text-main"><b>Sarah Jenkins</b> <span class="text-theme-text-muted">registered as a new client</span></div>
-                            <div class="text-[11.5px] text-theme-text-muted mt-1">4 hours ago</div>
-                        </div>
-                    </div>
+                    @empty
+                    <div class="px-6 py-10 text-center text-theme-text-muted text-sm italic">No recent activity</div>
+                    @endforelse
                 </div>
             </div>
             <div class="bg-theme-card rounded-[14px] border border-theme-border shadow-sm">

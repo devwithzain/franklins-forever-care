@@ -28,7 +28,7 @@ class AuthenticatedSessionController extends Controller
 
         if ($user->two_factor_enabled) {
             $code = rand(100000, 999999);
-            
+
             $user->update([
                 'two_factor_code' => Hash::make($code),
                 'two_factor_expires_at' => now()->addMinutes(10),
@@ -92,11 +92,11 @@ class AuthenticatedSessionController extends Controller
             return redirect()->intended(route('employee.dashboard'));
         }
 
-        if ($user->role === 'client') {
+        if ($user->role === 'client' || $user->role === 'user') {
             return redirect()->intended(route('client.dashboard'));
         }
 
-        return redirect()->intended('/');
+        return redirect()->intended('/dashboard');
     }
 
     public function destroy(Request $request): RedirectResponse
