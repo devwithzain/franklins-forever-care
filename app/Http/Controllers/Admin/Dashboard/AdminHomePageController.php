@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Admin\Dashboard;
 use App\Models\User;
 use App\Models\Client;
 use App\Models\ServiceBooking;
+use App\Models\Broadcast;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 
 class AdminHomePageController extends Controller
 {
@@ -92,7 +94,7 @@ class AdminHomePageController extends Controller
 
    public function notifications()
    {
-      $broadcasts = \App\Models\Broadcast::with('sender')->latest()->take(10)->get();
+      $broadcasts = Broadcast::with('sender')->latest()->paginate(10);
       return view('admin.container.notifications.index', compact('broadcasts'));
    }
 
@@ -103,7 +105,7 @@ class AdminHomePageController extends Controller
          'message' => 'required|string',
       ]);
 
-      \App\Models\Broadcast::create([
+      Broadcast::create([
          'audience' => $request->audience,
          'message' => $request->message,
          'sender_id' => auth()->id(),

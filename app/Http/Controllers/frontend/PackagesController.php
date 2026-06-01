@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\frontend;
 
 use App\Models\Service;
+use App\Models\ServiceBooking;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class PackagesController extends Controller
 {
@@ -23,6 +25,19 @@ class PackagesController extends Controller
             })
             ->get();
 
-        return view('frontend.packages.index', compact('services', 'selectedService', 'packages'));
+        // Get user's active subscriptions if authenticated
+        $userSubscriptions = [];
+        if (Auth::check()) {
+            $userSubscriptions = ServiceBooking::where('user_id', Auth::id())
+                ->whereIn('subscription_status', ['active', 'trialing'])
+                ->whereNull('subscription_ends_at')
+                ->orWhere('subscription_ends_at', '>', now())
+                ->get()
+                ->pluck('plan_type')
+                ->map(fn($plan) => strtolower(str_replace(' ', '', $plan)))
+                ->toArray();
+        }
+
+        return view('frontend.packages.index', compact('services', 'selectedService', 'packages', 'userSubscriptions'));
     }
 }

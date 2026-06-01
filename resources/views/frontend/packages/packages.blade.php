@@ -49,6 +49,10 @@
             @endif
             <div class="grid grid-cols-3 gap-8 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-1">
                 @foreach($packages as $package)
+                    @php
+                        $packagePlanKey = strtolower(str_replace(' ', '', $package['name']));
+                        $isSubscribed = in_array($packagePlanKey, $userSubscriptions ?? []);
+                    @endphp
                     <div class="relative group">
                         @if($package['popular'])
                             <div
@@ -56,8 +60,14 @@
                                 Most Popular
                             </div>
                         @endif
+                        @if($isSubscribed)
+                            <div
+                                class="absolute -top-4 right-4 z-10 bg-[#4A9D7A] text-white text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full shadow-lg">
+                                Active Subscription
+                            </div>
+                        @endif
                         <div
-                            class="h-full bg-white rounded-lg p-10 shadow-sm border border-gray-100 flex flex-col transition-all duration-500 hover:shadow-md hover:-translate-y-2 {{ $package['popular'] ? 'ring-2 ring-[#7E80B0] ring-offset-2 ring-offset-[#f8f9fa]' : '' }}">
+                            class="h-full bg-white rounded-lg p-10 shadow-sm border border-gray-100 flex flex-col transition-all duration-500 hover:shadow-md hover:-translate-y-2 {{ $package['popular'] ? 'ring-2 ring-[#7E80B0] ring-offset-2 ring-offset-[#f8f9fa]' : '' }} {{ $isSubscribed ? 'opacity-75' : '' }}">
                             <div class="mb-8">
                                 <div class="w-16 h-16 rounded-2xl flex items-center justify-center mb-6"
                                     style="background-color: {{ $package['color'] }}">
@@ -93,15 +103,24 @@
                                     @endforeach
                                 </ul>
                             </div>
-                            <a href="{{ route('service.checkout', ['slug' => (isset($selectedService) ? $selectedService->slug : (isset($services) ? (collect($services)->first()->slug ?? 'default') : 'default')), 'plan' => strtolower(str_replace(' ', '', $package['name']))]) }}"
-                                class="w-full py-5 rounded-lg font-bold text-sm transition-all duration-300 flex items-center justify-center gap-2 {{ $package['popular'] ? 'bg-[#7E80B0] text-white hover:bg-[#F0BB4C] hover:text-black shadow-lg shadow-[#7E80B0]/20' : 'bg-gray-100 text-[#666666] hover:bg-[#7E80B0] hover:text-white' }}">
-                                Choose This Package
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
-                                    stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                </svg>
-                            </a>
+                            @if($isSubscribed)
+                                <div class="w-full py-5 rounded-lg font-bold text-sm bg-[#4A9D7A] text-white flex items-center justify-center gap-2 cursor-default">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    Currently Subscribed
+                                </div>
+                            @else
+                                <a href="{{ route('service.checkout', ['slug' => (isset($selectedService) ? $selectedService->slug : (isset($services) ? (collect($services)->first()->slug ?? 'default') : 'default')), 'plan' => strtolower(str_replace(' ', '', $package['name']))]) }}"
+                                    class="w-full py-5 rounded-lg font-bold text-sm transition-all duration-300 flex items-center justify-center gap-2 {{ $package['popular'] ? 'bg-[#7E80B0] text-white hover:bg-[#F0BB4C] hover:text-black shadow-lg shadow-[#7E80B0]/20' : 'bg-gray-100 text-[#666666] hover:bg-[#7E80B0] hover:text-white' }}">
+                                    Choose This Package
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                                        stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                    </svg>
+                                </a>
+                            @endif
                         </div>
                     </div>
                 @endforeach

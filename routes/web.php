@@ -56,6 +56,8 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/about', [AboutController::class, 'index'])->name('about');
 Route::get('/blogs', [BlogsController::class, 'index'])->name('blogs');
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');
+Route::post('/contact', [ContactController::class, 'submit'])->name('contact.submit');
+Route::post('/newsletter/subscribe', [ContactController::class, 'subscribe'])->name('newsletter.subscribe');
 Route::get('/services', [ServicesController::class, 'index'])->name('services');
 Route::get('/packages', [PackagesController::class, 'index'])->name('packages');
 Route::get('/join-team', [CareerController::class, 'index'])->name('career.index');
