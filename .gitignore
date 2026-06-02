@@ -1,84 +1,58 @@
 ```
-# Environment
-.env
-.env.local
-.env.*
-
-# Dependencies
-vendor/
-node_modules/
-
 # Compiled and build artifacts
-*.php~
 *.pyc
 __pycache__/
 *.o
 *.obj
-dist/
-build/
-target/
+*.class
+*.exe
+*.dll
+*.so
+*.a
+*.out
+
+# Dependencies
+vendor/
+node_modules/
+.env
+.env.local
+*.env.*
 
 # Logs and temp files
 *.log
 *.tmp
 *.swp
+*.swo
 
 # Editors
 .vscode/
 .idea/
-*.swp
-*.swo
 
 # OS generated files
 .DS_Store
 Thumbs.db
 
-# Cache
-.cache/
-.mypy_cache/
-.pytest_cache/
-.coverage
+# Coverage reports
 coverage/
 htmlcov/
+.coverage
 
-# Authentication and session
-*.key
-*.pem
-*.crt
-*.cert
-session/
-sessions/
+# Laravel specific
+bootstrap/cache/
+storage/logs/
+storage/framework/cache/
+storage/framework/sessions/
+storage/framework/views/
+public/storage
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
 # Database
 *.db
-*.sqlite
-*.sqlite3
+*.db-journal
 
-# Backup files
-*~
-\#
-*.bak
-*.backup
-
-# Laravel specific
-/storage/logs/
-/storage/framework/cache/
-/storage/framework/sessions/
-/storage/framework/views/
-/public/hot
-/coverage/
-.npm
-.yarn
-.pnp
-.pnp.js
-
-# PHP specific
-*.phar
-*.so
-*.dll
-*.dylib
-
-# Compression archives
+# Compression
 *.zip
 *.gz
 *.tar

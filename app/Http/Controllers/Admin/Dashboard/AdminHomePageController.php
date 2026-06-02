@@ -6,12 +6,26 @@ use App\Models\User;
 use App\Models\Client;
 use App\Models\ServiceBooking;
 use App\Models\Broadcast;
+use App\Models\AdminNotification;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use App\Services\NotificationService;
+use App\Services\WorkloadBalancingService;
 
 class AdminHomePageController extends Controller
 {
+   protected NotificationService $notificationService;
+   protected WorkloadBalancingService $workloadService;
+
+   public function __construct(
+      NotificationService $notificationService,
+      WorkloadBalancingService $workloadService
+   ) {
+      $this->notificationService = $notificationService;
+      $this->workloadService = $workloadService;
+   }
+
    public function index()
    {
       $stats = [
@@ -23,6 +37,7 @@ class AdminHomePageController extends Controller
             ->whereMonth('created_at', now()->month)
             ->sum('amount'),
          'active_duty' => ServiceBooking::where('payment_status', 'paid')->count(),
+         'unassigned_bookings' => ServiceBooking::whereNull('agent_id')->whereIn('status', ['pending', 'confirmed'])->count(),
       ];
 
       // Growth calculation (comparing this month to last month)
@@ -31,15 +46,27 @@ class AdminHomePageController extends Controller
          ? round((($stats['total_clients'] - $lastMonthClients) / $lastMonthClients) * 100)
          : 100;
 
-      $recentActivities = ServiceBooking::with('service')
+      $recentActivities = ServiceBooking::with(['service', 'user', 'agent'])
          ->latest()
          ->take(5)
          ->get();
+
+      // Get notification counts
+      $notificationCounts = $this->notificationService->getUnreadCount();
+
+      // Get recent unread notifications
+      $recentNotifications = $this->notificationService->getRecentUnread(5);
+
+      // Get workload stats
+      $workloadStats = $this->workloadService->getWorkloadStats();
 
       return view('admin.container.home.dashboard', [
          'title' => "Admin Dashboard – Franklin's Forever Care",
          'stats' => $stats,
          'recentActivities' => $recentActivities,
+         'notificationCounts' => $notificationCounts,
+         'recentNotifications' => $recentNotifications,
+         'workloadStats' => $workloadStats,
       ]);
    }
 
