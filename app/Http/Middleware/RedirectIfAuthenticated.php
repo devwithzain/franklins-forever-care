@@ -20,7 +20,7 @@ class RedirectIfAuthenticated
                     return redirect()->route('admin.dashboard');
                 } elseif ($user->role === 'employee') {
                     return redirect()->route('employee.dashboard');
-                } elseif ($user->role === 'client' || $user->role === 'user') {
+                } elseif ($user->role === 'client') {
                     return redirect()->route('client.dashboard');
                 } else {
                     return redirect('/dashboard');

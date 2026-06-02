@@ -1,41 +1,84 @@
 ```
-# Compiled and build artifacts
-*.pyc
-__pycache__/
+# Environment
+.env
+.env.local
+.env.*
 
 # Dependencies
 vendor/
 node_modules/
 
+# Compiled and build artifacts
+*.php~
+*.pyc
+__pycache__/
+*.o
+*.obj
+dist/
+build/
+target/
+
 # Logs and temp files
 *.log
 *.tmp
-
-# Environment
-.env
-.env.local
-.env
-.env.local
-*.env.*
-!.env.example
+*.swp
 
 # Editors
 .vscode/
 .idea/
+*.swp
+*.swo
 
 # OS generated files
 .DS_Store
 Thumbs.db
 
-# Laravel specific
-bootstrap/cache/
-storage/logs/
-storage/framework/cache/
-storage/framework/sessions/
-storage/framework/views/
-public/storage/
+# Cache
+.cache/
+.mypy_cache/
+.pytest_cache/
+.coverage
+coverage/
+htmlcov/
 
-# Archives
+# Authentication and session
+*.key
+*.pem
+*.crt
+*.cert
+session/
+sessions/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Backup files
+*~
+\#
+*.bak
+*.backup
+
+# Laravel specific
+/storage/logs/
+/storage/framework/cache/
+/storage/framework/sessions/
+/storage/framework/views/
+/public/hot
+/coverage/
+.npm
+.yarn
+.pnp
+.pnp.js
+
+# PHP specific
+*.phar
+*.so
+*.dll
+*.dylib
+
+# Compression archives
 *.zip
 *.gz
 *.tar

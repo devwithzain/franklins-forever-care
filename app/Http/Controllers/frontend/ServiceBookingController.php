@@ -212,9 +212,15 @@ class ServiceBookingController extends Controller
             return $user->stripe_customer_id;
         }
 
+        // Require valid email for Stripe customer creation
+        $email = $user?->email;
+        if (!$email) {
+            throw new \Exception('Valid email is required to create a Stripe customer.');
+        }
+
         $customer = Customer::create([
-            'email' => $user->email ?? 'guest@example.com',
-            'name' => $user->name ?? 'Guest',
+            'email' => $email,
+            'name' => $user?->name ?? 'Guest',
             'payment_method' => $paymentMethodId,
         ]);
 

@@ -13,7 +13,7 @@ return new class extends Migration {
     public function up(): void
     {
         // MySQL requires modifying column with new enum values
-        DB::statement("ALTER TABLE users MODIFY role ENUM('admin', 'user', 'employee', 'client') NOT NULL DEFAULT 'user'");
+        DB::statement("ALTER TABLE users MODIFY role ENUM('admin', 'client', 'employee') NOT NULL DEFAULT 'client'");
     }
 
     /**
@@ -21,6 +21,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        DB::statement("ALTER TABLE users MODIFY role ENUM('admin', 'user') NOT NULL DEFAULT 'user'");
+        DB::statement("ALTER TABLE users MODIFY role ENUM('admin', 'client', 'employee') NOT NULL DEFAULT 'client'");
     }
 };

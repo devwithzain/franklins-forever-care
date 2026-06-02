@@ -23,6 +23,7 @@ class WebhookController extends Controller
                 config('services.stripe.webhook_secret')
             );
         } catch (\Exception $e) {
+            \Log::error('Stripe webhook validation failed: ' . $e->getMessage());
             return response()->json(['error' => 'Invalid signature'], 400);
         }
 
