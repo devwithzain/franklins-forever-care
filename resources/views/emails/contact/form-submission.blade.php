@@ -107,6 +107,19 @@
             font-size: 14px;
             margin-top: 20px;
         }
+        .reference-box {
+            background-color: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .reference-number {
+            font-size: 18px;
+            font-weight: 700;
+            color: #856404;
+        }
     </style>
 </head>
 <body>
@@ -116,6 +129,13 @@
         </div>
         
         <div class="content">
+            @if($submission && $submission->id)
+            <div class="reference-box">
+                <div class="label">Reference Number</div>
+                <div class="reference-number">#{{ str_pad($submission->id, 6, '0', STR_PAD_LEFT) }}</div>
+            </div>
+            @endif
+
             <p style="font-size: 16px; color: #666666; margin-bottom: 25px;">
                 You have received a new message from the contact form on your website.
             </p>
@@ -133,13 +153,20 @@
                 
                 <div class="info-row">
                     <div class="label">Phone Number</div>
-                    <div class="value">{{ $data['phone'] ?? 'N/A' }}</div>
+                    <div class="value">{{ $data['phone'] ?? 'Not provided' }}</div>
                 </div>
                 
                 <div class="info-row">
                     <div class="label">Subject</div>
                     <div class="value">{{ $data['subject'] ?? 'General Inquiry' }}</div>
                 </div>
+
+                @if($submission && $submission->ip_address)
+                <div class="info-row">
+                    <div class="label">IP Address</div>
+                    <div class="value">{{ $submission->ip_address }}</div>
+                </div>
+                @endif
             </div>
             
             <div class="message-box">
@@ -151,9 +178,11 @@
                 <strong>Submitted on:</strong> {{ now()->format('F j, Y \a\t g:i A') }}
             </p>
             
+            @if($submission && $submission->id)
             <center>
                 <a href="{{ route('admin.dashboard') }}" class="button">View in Dashboard</a>
             </center>
+            @endif
         </div>
         
         <div class="footer">

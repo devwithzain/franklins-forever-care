@@ -7,19 +7,20 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use App\Models\NewsletterSubscriber;
 
 class NewsletterSubscriptionMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public string $email;
+    public NewsletterSubscriber $subscriber;
 
     /**
      * Create a new message instance.
      */
-    public function __construct(string $email)
+    public function __construct(NewsletterSubscriber $subscriber)
     {
-        $this->email = $email;
+        $this->subscriber = $subscriber;
     }
 
     /**
@@ -28,7 +29,7 @@ class NewsletterSubscriptionMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Thank You for Subscribing to Our Newsletter',
+            subject: 'Confirm Your Newsletter Subscription - Franklin\'s Forever Care',
         );
     }
 

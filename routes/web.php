@@ -148,3 +148,26 @@ Route::middleware(['auth', 'client'])->group(function () {
 });
 
 require __DIR__ . '/auth.php';
+
+// Admin Communication Routes (Contact Submissions & Newsletter)
+Route::middleware(['auth', 'admin'])->prefix('dashboard')->name('admin.')->group(function () {
+    // Contact Submissions Management
+    Route::get('/contact-submissions', [\App\Http\Controllers\Admin\Communication\ContactSubmissionController::class, 'index'])->name('contact-submissions.index');
+    Route::get('/contact-submissions/{submission}', [\App\Http\Controllers\Admin\Communication\ContactSubmissionController::class, 'show'])->name('contact-submissions.show');
+    Route::post('/contact-submissions/{submission}/assign', [\App\Http\Controllers\Admin\Communication\ContactSubmissionController::class, 'assign'])->name('contact-submissions.assign');
+    Route::put('/contact-submissions/{submission}/status', [\App\Http\Controllers\Admin\Communication\ContactSubmissionController::class, 'updateStatus'])->name('contact-submissions.update-status');
+    Route::post('/contact-submissions/{submission}/mark-spam', [\App\Http\Controllers\Admin\Communication\ContactSubmissionController::class, 'markAsSpam'])->name('contact-submissions.mark-spam');
+    Route::post('/contact-submissions/{submission}/resolve', [\App\Http\Controllers\Admin\Communication\ContactSubmissionController::class, 'resolve'])->name('contact-submissions.resolve');
+    Route::delete('/contact-submissions/{submission}', [\App\Http\Controllers\Admin\Communication\ContactSubmissionController::class, 'destroy'])->name('contact-submissions.destroy');
+
+    // Newsletter Management
+    Route::get('/newsletter', [\App\Http\Controllers\Admin\Communication\NewsletterController::class, 'index'])->name('newsletter.index');
+    Route::get('/newsletter/create', [\App\Http\Controllers\Admin\Communication\NewsletterController::class, 'create'])->name('newsletter.create');
+    Route::post('/newsletter', [\App\Http\Controllers\Admin\Communication\NewsletterController::class, 'store'])->name('newsletter.store');
+    Route::get('/newsletter/{subscriber}', [\App\Http\Controllers\Admin\Communication\NewsletterController::class, 'show'])->name('newsletter.show');
+    Route::post('/newsletter/{subscriber}/confirm', [\App\Http\Controllers\Admin\Communication\NewsletterController::class, 'confirm'])->name('newsletter.confirm');
+    Route::post('/newsletter/{subscriber}/unsubscribe', [\App\Http\Controllers\Admin\Communication\NewsletterController::class, 'unsubscribe'])->name('newsletter.unsubscribe');
+    Route::post('/newsletter/{subscriber}/reactivate', [\App\Http\Controllers\Admin\Communication\NewsletterController::class, 'reactivate'])->name('newsletter.reactivate');
+    Route::delete('/newsletter/{subscriber}', [\App\Http\Controllers\Admin\Communication\NewsletterController::class, 'destroy'])->name('newsletter.destroy');
+    Route::get('/newsletter/export', [\App\Http\Controllers\Admin\Communication\NewsletterController::class, 'export'])->name('newsletter.export');
+});

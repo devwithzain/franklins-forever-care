@@ -30,11 +30,14 @@ class ServiceBooking extends Model
         'subscription_status',
         'subscription_ends_at',
         'user_id',
+        'agent_id',
+        'booking_date',
     ];
 
     protected $casts = [
         'subscription_ends_at' => 'datetime',
         'preferred_date' => 'date',
+        'booking_date' => 'date',
     ];
 
     public function user()
@@ -45,5 +48,10 @@ class ServiceBooking extends Model
     public function service()
     {
         return $this->belongsTo(Service::class);
+    }
+
+    public function agent()
+    {
+        return $this->belongsTo(User::class, 'agent_id');
     }
 }

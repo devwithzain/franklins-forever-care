@@ -11,12 +11,6 @@ use App\Http\Controllers\Auth\EmailVerificationPromptController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 
 Route::middleware('guest')->group(function () {
-    Route::get('verify-2fa', [AuthenticatedSessionController::class, 'twoFactorView'])
-        ->name('2fa.view');
-
-    Route::post('verify-2fa', [AuthenticatedSessionController::class, 'verifyTwoFactor'])
-        ->name('2fa.verify');
-
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
         ->name('password.request');
 
@@ -35,6 +29,13 @@ Route::middleware('guest')->group(function () {
     Route::post('reset-password', [NewPasswordController::class, 'store'])
         ->name('password.store');
 });
+
+// 2FA routes - accessible after login attempt but before full authentication
+Route::get('verify-2fa', [AuthenticatedSessionController::class, 'twoFactorView'])
+    ->name('2fa.view');
+
+Route::post('verify-2fa', [AuthenticatedSessionController::class, 'verifyTwoFactor'])
+    ->name('2fa.verify');
 
 Route::middleware('auth')->group(function () {
     Route::get('verify-email', EmailVerificationPromptController::class)

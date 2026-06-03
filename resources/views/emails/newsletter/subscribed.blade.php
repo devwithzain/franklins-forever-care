@@ -101,20 +101,57 @@
             color: #7E80B0;
             text-decoration: none;
         }
+        .confirmation-box {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .confirmation-text {
+            font-size: 16px;
+            color: #155724;
+            font-weight: 600;
+        }
+        .email-display {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+            font-size: 16px;
+            color: #333333;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🎉 Welcome to Our Newsletter!</h1>
+            <h1>🎉 Confirm Your Subscription!</h1>
         </div>
         
         <div class="content">
-            <h2>Thank You for Subscribing!</h2>
+            <h2>Almost Done!</h2>
             
-            <p>Dear Subscriber,</p>
+            <p>Hi {{ $subscriber->name ?? 'there' }},</p>
             
-            <p>Thank you for subscribing to our newsletter! We're excited to have you on board. You'll now receive regular updates about:</p>
+            <p>Thank you for your interest in Franklin's Forever Care newsletter! To complete your subscription and start receiving our updates, please confirm your email address.</p>
+            
+            <div class="email-display">
+                📧 {{ $subscriber->email }}
+            </div>
+
+            @if($subscriber->status === 'pending')
+            <div class="confirmation-box">
+                <div class="confirmation-text">
+                    ✓ Click the button below to confirm your subscription
+                </div>
+            </div>
+            @endif
+            
+            <p>Once confirmed, you'll receive regular updates about:</p>
             
             <div class="features">
                 <ul>
@@ -145,9 +182,9 @@
                 <a href="#">Instagram</a>
             </div>
             <p>&copy; {{ date('Y') }} Franklin's Forever Care. All rights reserved.</p>
-            <p>This email was sent to {{ $email }}</p>
+            <p>This email was sent to {{ $subscriber->email }}</p>
             <p style="margin-top: 15px; font-size: 11px;">
-                If you no longer wish to receive these emails, you can <a href="#" style="color: #999999;">unsubscribe here</a>.
+                If you did not request this subscription, you can safely ignore this email.
             </p>
         </div>
     </div>

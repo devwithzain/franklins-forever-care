@@ -7,19 +7,22 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use App\Models\ContactSubmission;
 
 class ContactFormMail extends Mailable
 {
     use Queueable, SerializesModels;
 
     public array $data;
+    public ?ContactSubmission $submission;
 
     /**
      * Create a new message instance.
      */
-    public function __construct(array $data)
+    public function __construct(array $data, ?ContactSubmission $submission = null)
     {
         $this->data = $data;
+        $this->submission = $submission;
     }
 
     /**

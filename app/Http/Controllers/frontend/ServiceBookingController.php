@@ -12,9 +12,17 @@ use Illuminate\Http\Request;
 use App\Models\ServiceBooking;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Services\NotificationService;
 
 class ServiceBookingController extends Controller
 {
+    protected NotificationService $notificationService;
+
+    public function __construct(NotificationService $notificationService)
+    {
+        $this->notificationService = $notificationService;
+    }
+
     public function checkout($slug, Request $request)
     {
         $service = Service::where('slug', $slug)->firstOrFail();
@@ -122,9 +130,13 @@ class ServiceBookingController extends Controller
                     'stripe_subscription_id' => $subscription->id,
                     'stripe_session_id' => $paymentIntent->id,
                     'subscription_status' => 'active',
+                    'booking_date' => $validated['preferred_date'] ?? now(),
                 ]);
 
                 $this->createOrUpdateClient($user, $booking);
+
+                // Create notification for admin about new unassigned booking
+                $this->notificationService->notifyUnassignedBooking($booking);
 
                 return redirect()->route('service.booking.success', ['id' => $booking->id]);
             }
@@ -212,9 +224,15 @@ class ServiceBookingController extends Controller
             return $user->stripe_customer_id;
         }
 
+        // Require valid email for Stripe customer creation
+        $email = $user?->email;
+        if (!$email) {
+            throw new \Exception('Valid email is required to create a Stripe customer.');
+        }
+
         $customer = Customer::create([
-            'email' => $user->email ?? 'guest@example.com',
-            'name' => $user->name ?? 'Guest',
+            'email' => $email,
+            'name' => $user?->name ?? 'Guest',
             'payment_method' => $paymentMethodId,
         ]);
 
