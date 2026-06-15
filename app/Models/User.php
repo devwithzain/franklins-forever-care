@@ -57,23 +57,8 @@ class User extends Authenticatable
         return $this->hasMany(ServiceBooking::class, 'agent_id');
     }
 
-    public function adminNotifications()
-    {
-        return $this->hasMany(AdminNotification::class);
-    }
-
     public function workloads()
     {
         return $this->hasMany(EmployeeWorkload::class, 'user_id');
-    }
-
-    public function unreadNotificationsCount(): int
-    {
-        return $this->adminNotifications()->unread()->count();
-    }
-
-    public function getUnreadNotificationsAttribute()
-    {
-        return $this->adminNotifications()->unread()->latest()->get();
     }
 }
