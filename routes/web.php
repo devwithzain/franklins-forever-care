@@ -71,6 +71,9 @@ Route::get('/service/{slug}', [ServiceDetailController::class, 'index'])->name('
 
 // Service Booking / Checkout routes (Authenticated)
 Route::middleware(['auth'])->group(function () {
+    Route::post('/notifications/mark-all-as-read', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-as-read');
+    Route::post('/notifications/{id}/mark-as-read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.mark-as-read');
+
     Route::get('/service-checkout/{slug}', [ServiceBookingController::class, 'checkout'])->name('service.checkout');
     Route::post('/service-checkout', [ServiceBookingController::class, 'store'])->name('service.booking.store');
     Route::get('/service-booking/success/{id}', [ServiceBookingController::class, 'success'])->name('service.booking.success');

@@ -79,7 +79,8 @@ class ClientHomePageController extends Controller
     public function notifications()
     {
         $broadcasts = \App\Models\Broadcast::with('sender')->latest()->paginate(10);
-        return view('client.dashboard.container.notifications.index', compact('broadcasts'));
+        $notifications = Auth::user()->notifications()->latest()->paginate(10);
+        return view('client.dashboard.container.notifications.index', compact('broadcasts', 'notifications'));
     }
 
     public function setting()

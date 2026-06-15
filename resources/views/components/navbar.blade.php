@@ -30,6 +30,10 @@
                 </path>
             </svg>
         </button>
+        @php
+            $unreadCount = auth()->user()->unreadNotifications()->count();
+            $recentNotifications = auth()->user()->unreadNotifications()->latest()->take(5)->get();
+        @endphp
         <div class="relative" x-data="{ open: false }">
             <button @click="open = !open"
                 class="relative w-[38px] h-[38px] rounded-full border border-theme-border bg-theme-card cursor-pointer flex items-center justify-center hover:bg-theme-hover transition-colors text-theme-muted hover:text-theme-main">
@@ -37,28 +41,38 @@
                     <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
                     <path d="M13.73 21a2 2 0 0 1-3.46 0" />
                 </svg>
-                <span class="absolute top-[7px] right-2 w-2 h-2 bg-[#e63b3b] rounded-full border-2 border-white"></span>
+                @if($unreadCount > 0)
+                    <span class="absolute top-[7px] right-2 w-2 h-2 bg-[#e63b3b] rounded-full border-2 border-white"></span>
+                @endif
             </button>
             <div x-show="open" @click.outside="open = false" x-transition
                 class="absolute top-[54px] right-0 w-[340px] bg-theme-card rounded-[14px] border border-theme-border shadow-[0_8px_32px_rgba(0,0,0,0.12)] z-[500] text-theme-main">
                 <div class="flex items-center justify-between px-[18px] py-4 border-b border-theme-border">
                     <h4 class="text-[14px] font-extrabold flex items-center gap-2">
                         Notifications
-                        <span class="bg-[#fee2e2] text-[#e63b3b] px-[7px] py-0.5 rounded-full text-[11px]">5 New</span>
+                        @if($unreadCount > 0)
+                            <span class="bg-[#fee2e2] text-[#e63b3b] px-[7px] py-0.5 rounded-full text-[11px]">{{ $unreadCount }} New</span>
+                        @endif
                     </h4>
                 </div>
                 <div class="max-h-[340px] overflow-y-auto">
-                    <div
-                        class="flex gap-[11px] px-[18px] py-[13px] border-b border-theme-border cursor-pointer hover:bg-theme-hover transition-colors bg-theme-bg">
-                        <div class="w-2 h-2 rounded-full mt-1.5 flex-shrink-0 bg-theme-primary"></div>
-                        <div>
-                            <div class="text-[12.5px] text-theme-main leading-relaxed"><b>Arthur
-                                    Morgan</b>
-                                has completed
-                                therapy session today.</div>
-                            <div class="text-[11px] text-slate-400 mt-0.5">2 minutes ago</div>
+                    @forelse($recentNotifications as $notification)
+                        <form action="{{ route('notifications.mark-as-read', $notification->id) }}" method="POST" class="m-0">
+                            @csrf
+                            <button type="submit" class="w-full text-left flex gap-[11px] px-[18px] py-[13px] border-b border-theme-border cursor-pointer hover:bg-theme-hover transition-colors bg-theme-bg">
+                                <div class="w-2 h-2 rounded-full mt-1.5 flex-shrink-0 bg-theme-primary"></div>
+                                <div>
+                                    <div class="text-[12.5px] text-theme-main leading-relaxed"><b>{{ $notification->data['title'] ?? 'Notification' }}</b><br>
+                                        {{ $notification->data['message'] ?? 'You have a new notification.' }}</div>
+                                    <div class="text-[11px] text-slate-400 mt-0.5">{{ $notification->created_at->diffForHumans() }}</div>
+                                </div>
+                            </button>
+                        </form>
+                    @empty
+                        <div class="px-[18px] py-[13px] text-center text-[12.5px] text-theme-muted">
+                            No new notifications.
                         </div>
-                    </div>
+                    @endforelse
                 </div>
                 <a href="{{ Auth::user()->role === 'employee' ? route('employee.notifications') : (Auth::user()->role === 'client' ? route('client.notifications') : route('admin.notifications')) }}"
                     class="px-[18px] py-3 text-center text-[13px] text-theme-primary font-semibold cursor-pointer hover:bg-theme-hover rounded-b-[14px] block">See
