@@ -12,8 +12,10 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        // MySQL requires modifying column with new enum values
-        DB::statement("ALTER TABLE users MODIFY role ENUM('admin', 'client', 'employee') NOT NULL DEFAULT 'client'");
+        if (DB::connection()->getDriverName() !== 'sqlite') {
+            // MySQL requires modifying column with new enum values
+            DB::statement("ALTER TABLE users MODIFY role ENUM('admin', 'client', 'employee') NOT NULL DEFAULT 'client'");
+        }
     }
 
     /**
@@ -21,6 +23,8 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        DB::statement("ALTER TABLE users MODIFY role ENUM('admin', 'client', 'employee') NOT NULL DEFAULT 'client'");
+        if (DB::connection()->getDriverName() !== 'sqlite') {
+            DB::statement("ALTER TABLE users MODIFY role ENUM('admin', 'client', 'employee') NOT NULL DEFAULT 'client'");
+        }
     }
 };
