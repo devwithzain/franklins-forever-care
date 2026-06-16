@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\Client\ClientController;
 use App\Http\Controllers\Admin\Setting\SettingController;
 use App\Http\Controllers\Admin\Employee\EmployeeController;
+use App\Http\Controllers\Employee\Dashboard\OutdoorSessionController;
 use App\Http\Controllers\Admin\Request\ClientRequestController;
 use App\Http\Controllers\Admin\Dashboard\AdminHomePageController;
 use App\Http\Controllers\Admin\ReportController;
@@ -154,6 +155,8 @@ Route::middleware(['auth', 'employee'])->group(function () {
     Route::post('/employee-dashboard/attendance/check-in', [EmployeeHomePageController::class, 'checkIn'])->name('employee.attendance.check-in');
     Route::post('/employee-dashboard/attendance/check-out', [EmployeeHomePageController::class, 'checkOut'])->name('employee.attendance.check-out');
     Route::get('/employee-dashboard/outdoor', [EmployeeHomePageController::class, 'outdoor'])->name('employee.outdoor');
+    Route::post('/employee-dashboard/outdoor/start', [OutdoorSessionController::class, 'store'])->name('employee.outdoor.start');
+    Route::post('/employee-dashboard/outdoor/{id}/stop', [OutdoorSessionController::class, 'stop'])->name('employee.outdoor.stop');
     Route::get('/employee-dashboard/requests', [EmployeeHomePageController::class, 'requests'])->name('employee.requests.index');
     Route::put('/employee-dashboard/requests/{clientRequest}/status', [EmployeeHomePageController::class, 'updateRequestStatus'])->name('employee.requests.update-status');
     Route::get('/employee-dashboard/notifications', [EmployeeHomePageController::class, 'notifications'])->name('employee.notifications');
