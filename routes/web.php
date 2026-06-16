@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\Setting\SettingController;
 use App\Http\Controllers\Admin\Employee\EmployeeController;
 use App\Http\Controllers\Admin\Request\ClientRequestController;
 use App\Http\Controllers\Admin\Dashboard\AdminHomePageController;
+use App\Http\Controllers\Admin\ReportController;
 
 // Auth Controllers
 use App\Http\Controllers\Auth\RegisteredUserController;
@@ -104,6 +105,10 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::put('/dashboard/complaints/{complaint}/status', [App\Http\Controllers\Admin\Complaint\ComplaintController::class, 'updateStatus'])->name('admin.complaints.updateStatus');
     Route::get('/dashboard/notifications', [AdminHomePageController::class, 'notifications'])->name('admin.notifications');
     Route::post('/dashboard/notifications/broadcast', [AdminHomePageController::class, 'storeBroadcast'])->name('admin.notifications.broadcast');
+    // Reports Routes
+    Route::get('/dashboard/reports', [ReportController::class, 'index'])->name('admin.reports');
+    Route::get('/dashboard/reports/export/csv', [ReportController::class, 'exportCsv'])->name('admin.reports.export.csv');
+    Route::get('/dashboard/reports/export/pdf', [ReportController::class, 'exportPdf'])->name('admin.reports.export.pdf');
     Route::post('/dashboard/notifications/{id}/mark-read', [AdminHomePageController::class, 'markAsRead'])->name('admin.notifications.mark-read');
     Route::post('/dashboard/notifications/mark-all-read', [AdminHomePageController::class, 'markAllAsRead'])->name('admin.notifications.mark-all-read');
     Route::get('/dashboard/reports', [AdminHomePageController::class, 'reports'])->name('admin.reports');

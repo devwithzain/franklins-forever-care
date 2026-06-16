@@ -61,4 +61,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(EmployeeWorkload::class, 'user_id');
     }
+
+    public function complaintsAgainst()
+    {
+        return $this->hasMany(Complaint::class, 'employee_id');
+    }
+
+    public function complaintsResolved()
+    {
+        return $this->hasMany(Complaint::class, 'resolved_by');
+    }
 }

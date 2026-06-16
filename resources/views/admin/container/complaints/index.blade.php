@@ -41,7 +41,12 @@
                 </div>
                 <div class="flex-1">
                     <div class="flex items-center justify-between mb-1">
-                        <span class="text-[14px] font-bold text-theme-text-main">{{ $complaint->subject }}</span>
+                        <span class="text-[14px] font-bold text-theme-text-main">
+                            {{ $complaint->subject }}
+                            @if($complaint->employee)
+                                <span class="ml-2 px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-[10px] font-bold">PCA: {{ $complaint->employee->name }}</span>
+                            @endif
+                        </span>
                         <span
                             class="text-[11px] {{ $complaint->priority === 'High' ? 'text-red-500' : 'text-amber-500' }} font-bold uppercase tracking-widest">{{ $complaint->priority }}</span>
                     </div>
@@ -57,8 +62,11 @@
                             <span
                                 class="text-[10px] text-theme-text-muted ml-2">{{ $complaint->created_at->diffForHumans() }}</span>
                         </div>
-                        <div class="flex gap-2">
+                        <div class="flex gap-2 items-center">
                             @if ($complaint->status === 'Pending')
+                                @if($complaint->employee)
+                                    <a href="{{ route('admin.clients.show', $complaint->client->id) }}" class="text-[11px] font-bold text-[#1a3cdc] hover:underline mr-3">Manage Client PCA</a>
+                                @endif
                                 <form action="{{ route('admin.complaints.updateStatus', $complaint->id) }}" method="POST">
                                     @csrf
                                     @method('PUT')
@@ -68,6 +76,9 @@
                                         as Resolved</button>
                                 </form>
                             @else
+                                @if($complaint->resolver)
+                                    <span class="text-[10px] text-theme-text-muted mr-2">Resolved by {{ $complaint->resolver->name }}</span>
+                                @endif
                                 <span class="px-3 py-1 bg-green-100 text-green-600 rounded-lg text-[11px] font-bold">Resolved</span>
                             @endif
                         </div>

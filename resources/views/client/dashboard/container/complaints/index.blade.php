@@ -39,6 +39,7 @@
                         <th class="px-6 py-3 text-[10.5px] font-bold text-theme-muted uppercase tracking-widest">Subject</th>
                         <th class="px-6 py-3 text-[10.5px] font-bold text-theme-muted uppercase tracking-widest">Priority</th>
                         <th class="px-6 py-3 text-[10.5px] font-bold text-theme-muted uppercase tracking-widest text-left">Description</th>
+                        <th class="px-6 py-3 text-[10.5px] font-bold text-theme-muted uppercase tracking-widest text-left">Involves PCA</th>
                         <th class="px-6 py-3 text-[10.5px] font-bold text-theme-muted uppercase tracking-widest">Submitted On</th>
                         <th class="px-6 py-3 text-[10.5px] font-bold text-theme-muted uppercase tracking-widest">Status</th>
                     </tr>
@@ -53,6 +54,13 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 text-[13px] max-w-[280px] truncate" title="{{ $complaint->description }}">{{ $complaint->description }}</td>
+                            <td class="px-6 py-4 text-[13px] text-theme-muted">
+                                @if($complaint->employee)
+                                    <span class="font-bold text-theme-main">{{ $complaint->employee->name }}</span>
+                                @else
+                                    General
+                                @endif
+                            </td>
                             <td class="px-6 py-4 text-[13px] text-theme-muted">{{ $complaint->created_at->format('M d, Y') }}</td>
                             <td class="px-6 py-4">
                                 <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase {{ $complaint->status === 'Resolved' ? 'bg-green-100 text-green-600' : 'bg-amber-100 text-amber-600' }}">
@@ -61,7 +69,7 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="5" class="px-6 py-10 text-center text-theme-muted">No complaints filed yet.</td></tr>
+                        <tr><td colspan="6" class="px-6 py-10 text-center text-theme-muted">No complaints filed yet.</td></tr>
                     @endforelse
                 </tbody>
             </table>
@@ -99,6 +107,18 @@
                         class="w-full bg-theme-bg border border-theme-border text-theme-main px-4 py-3 rounded-[10px] text-[13.5px] font-bold focus:outline-none focus:border-theme-primary transition-all placeholder-slate-400">
                 </div>
                 
+                <div>
+                    <label for="employee_id" class="block text-[12.5px] font-bold text-theme-muted uppercase tracking-wider mb-2">Does this involve a specific PCA? (Optional)</label>
+                    <select name="employee_id" id="employee_id" class="w-full bg-theme-bg border border-theme-border text-theme-main px-4 py-3 rounded-[10px] text-[13.5px] font-bold focus:outline-none focus:border-theme-primary transition-all">
+                        <option value="">No / General Complaint</option>
+                        @foreach($associatedEmployees as $employee)
+                            <option value="{{ $employee->id }}" {{ ($clientRecord && $clientRecord->agent_id == $employee->id) ? 'selected' : '' }}>
+                                {{ $employee->name }} {{ ($clientRecord && $clientRecord->agent_id == $employee->id) ? '(Current PCA)' : '' }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
                 <div>
                     <label for="priority" class="block text-[12.5px] font-bold text-theme-muted uppercase tracking-wider mb-2">Priority Level</label>
                     <select name="priority" id="priority" required

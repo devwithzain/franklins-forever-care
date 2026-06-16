@@ -10,7 +10,7 @@ class ComplaintController extends Controller
 {
     public function index()
     {
-        $complaints = Complaint::with('client.user')->latest()->paginate(10);
+        $complaints = Complaint::with(['client.user', 'employee', 'resolver'])->latest()->paginate(10);
 
         $stats = [
             'total' => Complaint::count(),
@@ -29,9 +29,10 @@ class ComplaintController extends Controller
         ]);
 
         $complaint->update([
-            'status' => $request->status
+            'status' => $request->status,
+            'resolved_by' => $request->status === 'Resolved' ? auth()->id() : null,
         ]);
 
-        return redirect()->route('admin.complaints.index')->with('success', 'Complaint status updated to ' . $request->status);
+        return redirect()->route('admin.complaints')->with('success', 'Complaint status updated to ' . $request->status);
     }
 }

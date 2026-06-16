@@ -224,11 +224,17 @@ class ClientHomePageController extends Controller
         $user = Auth::user();
         $clientRecord = Client::where('user_id', $user->id)->first();
         
-        $complaints = \App\Models\Complaint::where('client_id', $clientRecord->id ?? 0)
+        $complaints = \App\Models\Complaint::with('employee')->where('client_id', $clientRecord->id ?? 0)
             ->latest()
             ->paginate(10);
 
-        return view('client.dashboard.container.complaints.index', compact('complaints'));
+        // Get past/current employees assigned to the client via bookings
+        $associatedEmployees = \App\Models\User::where('role', 'employee')
+            ->whereHas('assignedBookings', function($query) use ($user) {
+                $query->where('user_id', $user->id);
+            })->get();
+
+        return view('client.dashboard.container.complaints.index', compact('complaints', 'associatedEmployees', 'clientRecord'));
     }
 
     public function storeComplaint(Request $request)
@@ -243,15 +249,35 @@ class ClientHomePageController extends Controller
             'subject' => 'required|string|max:255',
             'priority' => 'required|string|in:Low,Medium,High',
             'description' => 'required|string|min:10',
+            'employee_id' => 'nullable|exists:users,id',
         ]);
 
-        \App\Models\Complaint::create([
+        $complaint = \App\Models\Complaint::create([
             'client_id' => $clientRecord->id,
+            'employee_id' => $validatedData['employee_id'] ?? null,
             'subject' => $validatedData['subject'],
             'priority' => $validatedData['priority'],
             'description' => $validatedData['description'],
             'status' => 'Pending',
         ]);
+
+        // Notify admins about the new complaint
+        $admins = \App\Models\User::where('role', 'admin')->get();
+        $notification = new \App\Notifications\SystemNotification(
+            'New Client Complaint',
+            "{$user->name} has submitted a new complaint.",
+            'complaint',
+            [
+                'complaint_id' => $complaint->id,
+                'client_name' => $user->name,
+                'subject' => $complaint->subject,
+                'priority' => $complaint->priority,
+                'involves_employee' => !is_null($complaint->employee_id)
+            ]
+        );
+        foreach ($admins as $admin) {
+            $admin->notify($notification);
+        }
 
         return redirect()->route('client.complaints.index')->with('success', 'Complaint registered successfully! Our care team will review this shortly.');
     }
