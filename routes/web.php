@@ -111,7 +111,6 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/dashboard/reports/export/pdf', [ReportController::class, 'exportPdf'])->name('admin.reports.export.pdf');
     Route::post('/dashboard/notifications/{id}/mark-read', [AdminHomePageController::class, 'markAsRead'])->name('admin.notifications.mark-read');
     Route::post('/dashboard/notifications/mark-all-read', [AdminHomePageController::class, 'markAllAsRead'])->name('admin.notifications.mark-all-read');
-    Route::get('/dashboard/reports', [AdminHomePageController::class, 'reports'])->name('admin.reports');
 
     // Booking Management Routes
     Route::get('/dashboard/bookings', [BookingManagementController::class, 'index'])->name('admin.bookings.index');

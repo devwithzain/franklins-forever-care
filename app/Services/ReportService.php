@@ -102,24 +102,24 @@ class ReportService
             $current->addDay();
         }
 
-        // Only group by days if the range is small enough (e.g. <= 31 days) to prevent massive datasets.
-        // For simplicity, we'll aggregate by Date for charts.
-        $formatStr = '%Y-%m-%d';
+        // Get DB driver
+        $driver = DB::connection()->getDriverName();
+        $dateFormat = $driver === 'sqlite' ? "strftime('%Y-%m-%d', created_at)" : "DATE_FORMAT(created_at, '%Y-%m-%d')";
 
         $newClients = Client::whereBetween('created_at', [$start, $end])
-            ->select(DB::raw("strftime('{$formatStr}', created_at) as date"), DB::raw('count(*) as count'))
+            ->select(DB::raw("{$dateFormat} as date"), DB::raw('count(*) as count'))
             ->groupBy('date')
             ->pluck('count', 'date')
             ->toArray();
 
         $newBookings = ServiceBooking::whereBetween('created_at', [$start, $end])
-            ->select(DB::raw("strftime('{$formatStr}', created_at) as date"), DB::raw('count(*) as count'))
+            ->select(DB::raw("{$dateFormat} as date"), DB::raw('count(*) as count'))
             ->groupBy('date')
             ->pluck('count', 'date')
             ->toArray();
 
         $newComplaints = Complaint::whereBetween('created_at', [$start, $end])
-            ->select(DB::raw("strftime('{$formatStr}', created_at) as date"), DB::raw('count(*) as count'))
+            ->select(DB::raw("{$dateFormat} as date"), DB::raw('count(*) as count'))
             ->groupBy('date')
             ->pluck('count', 'date')
             ->toArray();

@@ -146,20 +146,13 @@ class AdminHomePageController extends Controller
    }
 
    public function notifications()
-<<<<<<< HEAD
-    {
-        $broadcasts = Broadcast::with('sender')->latest()->paginate(10);
-        $notifications = $this->notificationService->getAllForUser(null);
-        $notificationCounts = $this->notificationService->getUnreadCountForUser(null);
-        return view('admin.container.notifications.index', compact('broadcasts', 'notifications', 'notificationCounts'));
-    }
-=======
    {
+      $user = auth()->user();
       $broadcasts = Broadcast::with('sender')->latest()->paginate(10);
-      $notifications = auth()->user()->notifications()->latest()->paginate(10);
-      return view('admin.container.notifications.index', compact('broadcasts', 'notifications'));
+      $notifications = $this->notificationService->getAllForUser($user);
+      $notificationCounts = $this->notificationService->getUnreadCount($user);
+      return view('admin.container.notifications.index', compact('broadcasts', 'notifications', 'notificationCounts'));
    }
->>>>>>> 2d3fa374d412d382cfae29cceed31efb73144935
 
     public function storeBroadcast(Request $request)
     {
@@ -181,20 +174,17 @@ class AdminHomePageController extends Controller
 
     public function markAsRead($id)
     {
-        $this->notificationService->markAsRead($id, null);
+        $user = auth()->user();
+        $this->notificationService->markAsRead($user, $id);
         return redirect()->back()->with('success', 'Notification marked as read.');
     }
 
     public function markAllAsRead()
     {
-        $this->notificationService->markAllAsReadForUser(null);
+        $user = auth()->user();
+        $this->notificationService->markAllAsRead($user);
         return redirect()->back()->with('success', 'All notifications marked as read.');
     }
-
-   public function reports()
-   {
-      return view('admin.container.reports.index');
-   }
 
    public function storeReminder(Request $request)
    {

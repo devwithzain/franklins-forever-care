@@ -25,15 +25,10 @@ class AppServiceProvider extends ServiceProvider
         \Illuminate\Support\Facades\View::composer('components.navbar', function ($view) {
             if (auth()->check()) {
                 $notificationService = app(NotificationService::class);
-                $userId = auth()->id();
+                $user = auth()->user();
                 
-                if (auth()->user()->role === 'admin') {
-                    $notificationCounts = $notificationService->getUnreadCountForUser(null);
-                    $recentNotifications = $notificationService->getRecentUnreadForUser(5, null);
-                } else {
-                    $notificationCounts = $notificationService->getUnreadCountForUser($userId);
-                    $recentNotifications = $notificationService->getRecentUnreadForUser(5, $userId);
-                }
+                $notificationCounts = $notificationService->getUnreadCount($user);
+                $recentNotifications = $notificationService->getRecentUnread($user, 5);
                 
                 $view->with([
                     'notificationCounts' => $notificationCounts,

@@ -1,18 +1,16 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('career_applications', function (Blueprint $row) {
             $row->id();
+             $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
             $row->string('full_name');
             $row->string('email');
             $row->string('phone');
@@ -21,14 +19,10 @@ return new class extends Migration
             $row->string('state');
             $row->string('zip_code');
             $row->text('message')->nullable();
-            $row->string('status')->default('pending'); // pending, reviewed, accepted, rejected
+            $row->string('status')->default('pending'); 
             $row->timestamps();
         });
     }
-
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('career_applications');

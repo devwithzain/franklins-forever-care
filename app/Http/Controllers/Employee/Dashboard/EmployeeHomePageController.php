@@ -23,8 +23,8 @@ class EmployeeHomePageController extends Controller
         $application = \App\Models\CareerApplication::where('user_id', $user->id)->latest()->first();
 
         // Get notifications
-        $notificationCounts = $this->notificationService->getUnreadCountForUser($user->id);
-        $recentNotifications = $this->notificationService->getRecentUnreadForUser(5, $user->id);
+        $notificationCounts = $this->notificationService->getUnreadCount($user);
+        $recentNotifications = $this->notificationService->getRecentUnread($user, 5);
 
         // FIX 1: Removed auto check-in. Just fetch today's attendance if it exists.
         $todayAttendance = null;
@@ -366,9 +366,25 @@ class EmployeeHomePageController extends Controller
 
     public function notifications()
     {
+        $user = Auth::user();
+        $notifications = $this->notificationService->getAllForUser($user);
+        $notificationCounts = $this->notificationService->getUnreadCount($user);
         $broadcasts = \App\Models\Broadcast::with('sender')->latest()->paginate(10);
-        $notifications = Auth::user()->notifications()->latest()->paginate(10);
-        return view('employee.container.notifications.index', compact('broadcasts', 'notifications'));
+        return view('employee.container.notifications.index', compact('notifications', 'notificationCounts', 'broadcasts'));
+    }
+
+    public function markAsRead($id)
+    {
+        $user = Auth::user();
+        $this->notificationService->markAsRead($user, $id);
+        return redirect()->back()->with('success', 'Notification marked as read.');
+    }
+
+    public function markAllAsRead()
+    {
+        $user = Auth::user();
+        $this->notificationService->markAllAsRead($user);
+        return redirect()->back()->with('success', 'All notifications marked as read.');
     }
 
     public function setting()

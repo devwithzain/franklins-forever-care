@@ -95,9 +95,9 @@ class NotificationService
      */
     public function notifyAgentAssignment(ServiceBooking $booking, User $agent): void
     {
+        // Notify admins
         $admins = User::where('role', 'admin')->get();
-
-        $notification = new SystemNotification(
+        $adminNotification = new SystemNotification(
             'Agent Assigned to Booking',
             "{$agent->name} has been assigned to {$booking->patient_name}.",
             'agent_assigned',
@@ -109,15 +109,56 @@ class NotificationService
                 'booking_date' => $booking->preferred_date?->format('Y-m-d'),
             ]
         );
-
         foreach ($admins as $admin) {
-            $admin->notify($notification);
+            $admin->notify($adminNotification);
+        }
+
+        // Notify the agent
+        $agentNotification = new SystemNotification(
+            'New Booking Assigned',
+            "You have been assigned to {$booking->patient_name}.",
+            'agent_assigned',
+            [
+                'booking_id' => $booking->id,
+                'agent_id' => $agent->id,
+                'agent_name' => $agent->name,
+                'patient_name' => $booking->patient_name,
+                'booking_date' => $booking->preferred_date?->format('Y-m-d'),
+            ]
+        );
+        $agent->notify($agentNotification);
+    }
+
+    /**
+     * Create a broadcast notification for all users
+     */
+    public function notifyBroadcast($broadcast): void
+    {
+        $audience = $broadcast->audience;
+        $usersQuery = User::query();
+        
+        if ($audience !== 'all') {
+            $usersQuery->where('role', $audience);
+        }
+        
+        $users = $usersQuery->get();
+        
+        foreach ($users as $user) {
+            $notification = new SystemNotification(
+                'Announcement',
+                $broadcast->message,
+                'broadcast',
+                [
+                    'broadcast_id' => $broadcast->id,
+                    'sender_id' => $broadcast->sender_id,
+                ]
+            );
+            $user->notify($notification);
         }
     }
 
     /**
-     * Get unread notifications count for admin dashboard
-     * We'll need to pass the user here. For AdminHomePageController we use auth()->user().
+     * Get unread notifications count for a user
      */
     public function getUnreadCount(User $user): array
     {
@@ -129,6 +170,7 @@ class NotificationService
             'pending_requests' => $unread->filter(fn ($n) => isset($n->data['type']) && $n->data['type'] === 'pending_request')->count(),
             'payment_overdue' => $unread->filter(fn ($n) => isset($n->data['type']) && $n->data['type'] === 'payment_overdue')->count(),
             'agent_assigned' => $unread->filter(fn ($n) => isset($n->data['type']) && $n->data['type'] === 'agent_assigned')->count(),
+            'broadcast' => $unread->filter(fn ($n) => isset($n->data['type']) && $n->data['type'] === 'broadcast')->count(),
         ];
     }
 
@@ -138,6 +180,14 @@ class NotificationService
     public function getRecentUnread(User $user, int $limit = 10)
     {
         return $user->unreadNotifications()->latest()->limit($limit)->get();
+    }
+
+    /**
+     * Get all notifications for a user with pagination
+     */
+    public function getAllForUser(User $user, int $limit = 20)
+    {
+        return $user->notifications()->latest()->paginate($limit);
     }
 
     /**
@@ -154,23 +204,7 @@ class NotificationService
     }
 
     /**
-     * Mark all notifications as read for a specific user
-     */
-    public function markAllAsReadForUser(?int $userId = null): int
-    {
-        $query = AdminNotification::where('is_read', false);
-        
-        if ($userId) {
-            $query->where('user_id', $userId);
-        } else {
-            $query->whereNull('user_id');
-        }
-        
-        return $query->update(['is_read' => true]);
-    }
-
-    /**
-     * Mark all notifications as read
+     * Mark all notifications as read for a user
      */
     public function markAllAsRead(User $user): void
     {

@@ -13,7 +13,11 @@ return new class extends Migration {
             $table->string('password');
             $table->string('email')->unique();
             $table->string('image')->nullable();
+            $table->string('two_factor_code')->nullable();
+            $table->string('stripe_customer_id')->nullable();
             $table->timestamp('email_verified_at')->nullable();
+            $table->boolean('two_factor_enabled')->default(false);
+            $table->dateTime('two_factor_expires_at')->nullable();
             $table->enum('role', ['admin', 'client','employee'])->default('client');
             $table->rememberToken();
             $table->timestamps();
@@ -33,11 +37,19 @@ return new class extends Migration {
             $table->longText('payload');
             $table->integer('last_activity')->index();
         });
+        Schema::create('otps', function (Blueprint $table) {
+            $table->id();
+            $table->string('email')->index();
+            $table->string('code');
+            $table->timestamp('expires_at');
+            $table->timestamps();
+        });
     }
     public function down(): void
     {
         Schema::dropIfExists('users');
         Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
+        Schema::dropIfExists('otps');
     }
 };

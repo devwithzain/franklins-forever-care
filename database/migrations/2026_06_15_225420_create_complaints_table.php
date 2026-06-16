@@ -9,11 +9,13 @@ return new class extends Migration {
     {
         Schema::create('complaints', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('client_id')->constrained()->onDelete('cascade');
             $table->string('subject');
             $table->text('description');
-            $table->enum('priority', ['Low', 'Medium', 'High'])->default('Medium');
+            $table->foreignId('client_id')->constrained()->onDelete('cascade');
             $table->enum('status', ['Pending', 'Resolved'])->default('Pending');
+            $table->enum('priority', ['Low', 'Medium', 'High'])->default('Medium');
+            $table->foreignId('resolved_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('employee_id')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }
