@@ -154,6 +154,22 @@ class NotificationService
     }
 
     /**
+     * Mark all notifications as read for a specific user
+     */
+    public function markAllAsReadForUser(?int $userId = null): int
+    {
+        $query = AdminNotification::where('is_read', false);
+        
+        if ($userId) {
+            $query->where('user_id', $userId);
+        } else {
+            $query->whereNull('user_id');
+        }
+        
+        return $query->update(['is_read' => true]);
+    }
+
+    /**
      * Mark all notifications as read
      */
     public function markAllAsRead(User $user): void

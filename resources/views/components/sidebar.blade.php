@@ -177,21 +177,59 @@
                      class="px-1.5 py-0.5 rounded-full bg-red-100 text-red-600 text-[9px] font-extrabold">{{ $pendingRequestsCount ?? 0 }}</span>
                </a>
                <a href="{{ route('admin.complaints') }}"
-                  class="flex items-center justify-between px-3 py-2.5 rounded-[10px] {{ Request::routeIs('admin.complaints') ? 'bg-theme-primary text-white shadow-md' : 'text-theme-muted hover:bg-theme-hover' }} transition-all group">
-                  <div class="flex items-center gap-3">
-                     <svg
-                        class="w-[18px] h-[18px] {{ Request::routeIs('admin.complaints') ? 'text-white' : 'text-slate-400 group-hover:text-slate-600' }}"
-                        fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path
-                           d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-                        <line x1="12" y1="9" x2="12" y2="13" />
-                        <line x1="12" y1="17" x2="12.01" y2="17" />
-                     </svg>
-                     <span class="text-[13.5px] font-bold">Complaints</span>
-                  </div>
-                  <span
-                     class="px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-600 text-[9px] font-extrabold">{{ $pendingComplaintsCount ?? 0 }}</span>
-               </a>
+                   class="flex items-center justify-between px-3 py-2.5 rounded-[10px] {{ Request::routeIs('admin.complaints') ? 'bg-theme-primary text-white shadow-md' : 'text-theme-muted hover:bg-theme-hover' }} transition-all group">
+                   <div class="flex items-center gap-3">
+                      <svg
+                         class="w-[18px] h-[18px] {{ Request::routeIs('admin.complaints') ? 'text-white' : 'text-slate-400 group-hover:text-slate-600' }}"
+                         fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                         <path
+                            d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                         <line x1="12" y1="9" x2="12" y2="13" />
+                         <line x1="12" y1="17" x2="12.01" y2="17" />
+                      </svg>
+                      <span class="text-[13.5px] font-bold">Complaints</span>
+                   </div>
+                   <span
+                      class="px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-600 text-[9px] font-extrabold">{{ $pendingComplaintsCount ?? 0 }}</span>
+                </a>
+                <a href="{{ route('admin.contact-submissions.index') }}"
+                   class="flex items-center justify-between px-3 py-2.5 rounded-[10px] {{ Request::routeIs('admin.contact-submissions.*') ? 'bg-theme-primary text-white shadow-md' : 'text-theme-muted hover:bg-theme-hover' }} transition-all group">
+                   <div class="flex items-center gap-3">
+                      <svg
+                         class="w-[18px] h-[18px] {{ Request::routeIs('admin.contact-submissions.*') ? 'text-white' : 'text-slate-400 group-hover:text-slate-600' }}"
+                         fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                         <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                         <polyline points="22,6 12,13 2,6" />
+                      </svg>
+                      <span class="text-[13.5px] font-bold">Inquiries</span>
+                   </div>
+                   @php
+                       $newInquiriesCount = \App\Models\ContactSubmission::where('status', \App\Models\ContactSubmission::STATUS_NEW)->count();
+                   @endphp
+                   @if($newInquiriesCount > 0)
+                       <span class="px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-600 text-[9px] font-extrabold">{{ $newInquiriesCount }}</span>
+                   @endif
+                </a>
+                <a href="{{ route('admin.newsletter.index') }}"
+                    class="flex items-center justify-between px-3 py-2.5 rounded-[10px] {{ Request::routeIs('admin.newsletter.*') ? 'bg-theme-primary text-white shadow-md' : 'text-theme-muted hover:bg-theme-hover' }} transition-all group">
+                    <div class="flex items-center gap-3">
+                       <svg
+                          class="w-[18px] h-[18px] {{ Request::routeIs('admin.newsletter.*') ? 'text-white' : 'text-slate-400 group-hover:text-slate-600' }}"
+                          fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                          <circle cx="9" cy="7" r="4" />
+                          <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                       </svg>
+                       <span class="text-[13.5px] font-bold">Subscribers</span>
+                    </div>
+                    @php
+                        $pendingSubscribersCount = \App\Models\NewsletterSubscriber::where('status', \App\Models\NewsletterSubscriber::STATUS_PENDING)->count();
+                    @endphp
+                    @if($pendingSubscribersCount > 0)
+                        <span class="px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-600 text-[9px] font-extrabold">{{ $pendingSubscribersCount }}</span>
+                    @endif
+                 </a>
             </div>
          </div>
          <div>
