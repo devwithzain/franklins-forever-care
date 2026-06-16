@@ -104,6 +104,12 @@ class EmployeeController extends Controller
         return redirect()->route('admin.employees.index')->with('success', 'Agent updated successfully.');
     }
 
+    public function showApplication($id)
+    {
+        $application = \App\Models\CareerApplication::findOrFail($id);
+        return view('admin.container.employees.show-application', compact('application'));
+    }
+
     public function approveApplication($id)
     {
         $application = \App\Models\CareerApplication::findOrFail($id);

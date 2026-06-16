@@ -65,8 +65,7 @@ Route::post('/newsletter/subscribe', [ContactController::class, 'subscribe'])
     ->middleware('throttle:5,1')->name('newsletter.subscribe');
 Route::get('/services', [ServicesController::class, 'index'])->name('services');
 Route::get('/packages', [PackagesController::class, 'index'])->name('packages');
-Route::get('/join-team', [CareerController::class, 'index'])->name('career.index');
-Route::post('/join-team', [CareerController::class, 'store'])->name('career.store');
+
 Route::get('/blog/{slug}', [BlogDetailController::class, 'index'])->name('blog-detail');
 Route::get('/privacy-policy', [PageController::class, 'privacy'])->name('privacy-policy');
 Route::get('/terms-conditions', [PageController::class, 'terms'])->name('terms-conditions');
@@ -82,6 +81,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/service-booking/success/{id}', [ServiceBookingController::class, 'success'])->name('service.booking.success');
     Route::get('/service-booking/cancel/{id}', [ServiceBookingController::class, 'cancel'])->name('service.booking.cancel');
     Route::post('/service-booking/{id}/cancel-subscription', [ServiceBookingController::class, 'cancelSubscription'])->name('service.booking.cancel-subscription');
+
+    // Career Application routes (Authenticated)
+    Route::get('/join-team', [CareerController::class, 'index'])->name('career.index');
+    Route::post('/join-team', [CareerController::class, 'store'])->name('career.store');
 });
 
 // Stripe Webhook (outside auth middleware, CSRF exempt)
@@ -94,6 +97,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::resource('/dashboard/clients', ClientController::class)->names('admin.clients');
 
     Route::resource('/dashboard/employees', EmployeeController::class, ['names' => 'admin.employees']);
+    Route::get('/dashboard/employees/application/{id}', [EmployeeController::class, 'showApplication'])->name('admin.employees.show-application');
     Route::post('/dashboard/employees/approve/{id}', [EmployeeController::class, 'approveApplication'])->name('admin.employees.approve');
     Route::get('/dashboard/attendance', [AdminHomePageController::class, 'attendance'])->name('admin.attendance');
     Route::get('/dashboard/payments', [AdminHomePageController::class, 'payments'])->name('admin.payments');

@@ -10,14 +10,21 @@ class CareerController extends Controller
 {
     public function index()
     {
-        return view('frontend.career.index');
+        $user = auth()->user();
+        return view('frontend.career.index', compact('user'));
     }
 
     public function store(Request $request)
     {
+        $user = auth()->user();
+        
         $validated = $request->validate([
             'full_name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
+            'email' => ['required', 'email', 'max:255', function ($attribute, $value, $fail) use ($user) {
+                if ($value !== $user->email) {
+                    $fail('You must use your registered email address.');
+                }
+            }],
             'phone' => 'required|string|max:20',
             'address' => 'required|string|max:255',
             'city' => 'required|string|max:100',
@@ -27,7 +34,7 @@ class CareerController extends Controller
         ]);
 
         CareerApplication::create(array_merge($validated, [
-            'user_id' => auth()->id()
+            'user_id' => $user->id
         ]));
 
         return back()->with('success', 'Your application has been submitted successfully. We will get back to you soon!');
