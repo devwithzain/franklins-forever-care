@@ -8,10 +8,16 @@ class Attendance extends Model
 {
     protected $fillable = [
         'employee_id',
+        'service_booking_id',
+        'client_id',
         'check_in',
         'check_out',
         'status',
         'note',
+        'check_in_latitude',
+        'check_in_longitude',
+        'check_out_latitude',
+        'check_out_longitude',
     ];
 
     protected $casts = [
@@ -22,5 +28,15 @@ class Attendance extends Model
     public function employee()
     {
         return $this->belongsTo(Employee::class);
+    }
+
+    public function serviceBooking()
+    {
+        return $this->belongsTo(ServiceBooking::class);
+    }
+
+    public function client()
+    {
+        return $this->belongsTo(Client::class);
     }
 }

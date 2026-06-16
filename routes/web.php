@@ -152,8 +152,9 @@ Route::middleware(['auth', 'employee'])->group(function () {
     Route::get('/employee-dashboard', [EmployeeHomePageController::class, 'index'])->name('employee.dashboard');
     Route::get('/employee-dashboard/clients', [EmployeeHomePageController::class, 'clients'])->name('employee.clients.index');
     Route::get('/employee-dashboard/attendance', [EmployeeHomePageController::class, 'attendance'])->name('employee.attendance');
-    Route::post('/employee-dashboard/attendance/check-in', [EmployeeHomePageController::class, 'checkIn'])->name('employee.attendance.check-in');
-    Route::post('/employee-dashboard/attendance/check-out', [EmployeeHomePageController::class, 'checkOut'])->name('employee.attendance.check-out');
+    Route::post('/employee-dashboard/attendance/{booking_id}/check-in', [EmployeeHomePageController::class, 'checkIn'])->name('employee.attendance.check-in');
+    Route::post('/employee-dashboard/attendance/{attendance_id}/check-out', [EmployeeHomePageController::class, 'checkOut'])->name('employee.attendance.check-out');
+    Route::post('/employee-dashboard/attendance/{attendance_id}/missed-punch', [EmployeeHomePageController::class, 'missedPunch'])->name('employee.attendance.missed-punch');
     Route::get('/employee-dashboard/outdoor', [EmployeeHomePageController::class, 'outdoor'])->name('employee.outdoor');
     Route::post('/employee-dashboard/outdoor/start', [OutdoorSessionController::class, 'store'])->name('employee.outdoor.start');
     Route::post('/employee-dashboard/outdoor/{id}/stop', [OutdoorSessionController::class, 'stop'])->name('employee.outdoor.stop');
