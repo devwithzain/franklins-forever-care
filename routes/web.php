@@ -99,6 +99,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::put('/dashboard/complaints/{complaint}/status', [App\Http\Controllers\Admin\Complaint\ComplaintController::class, 'updateStatus'])->name('admin.complaints.updateStatus');
     Route::get('/dashboard/notifications', [AdminHomePageController::class, 'notifications'])->name('admin.notifications');
     Route::post('/dashboard/notifications/broadcast', [AdminHomePageController::class, 'storeBroadcast'])->name('admin.notifications.broadcast');
+    Route::post('/dashboard/notifications/{id}/mark-read', [AdminHomePageController::class, 'markAsRead'])->name('admin.notifications.mark-read');
+    Route::post('/dashboard/notifications/mark-all-read', [AdminHomePageController::class, 'markAllAsRead'])->name('admin.notifications.mark-all-read');
     Route::get('/dashboard/reports', [AdminHomePageController::class, 'reports'])->name('admin.reports');
 
     // Dynamic Content Routes
@@ -115,6 +117,11 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/dashboard/setting', [SettingController::class, 'index'])->name('admin.container.setting.index');
     Route::put('/dashboard/setting/{id}', [SettingController::class, 'update'])->name('admin.container.setting.update');
     Route::delete('/dashboard/setting/session/{id}', [SettingController::class, 'logoutSession'])->name('admin.setting.logout-session');
+
+    // Reminder routes
+    Route::post('/dashboard/reminders', [AdminHomePageController::class, 'storeReminder'])->name('admin.reminders.store');
+    Route::post('/dashboard/reminders/{reminder}/toggle', [AdminHomePageController::class, 'toggleReminder'])->name('admin.reminders.toggle');
+    Route::delete('/dashboard/reminders/{reminder}', [AdminHomePageController::class, 'deleteReminder'])->name('admin.reminders.delete');
 });
 
 // Employee routes (only for authenticated employees)
@@ -122,10 +129,14 @@ Route::middleware(['auth', 'employee'])->group(function () {
     Route::get('/employee-dashboard', [EmployeeHomePageController::class, 'index'])->name('employee.dashboard');
     Route::get('/employee-dashboard/clients', [EmployeeHomePageController::class, 'clients'])->name('employee.clients.index');
     Route::get('/employee-dashboard/attendance', [EmployeeHomePageController::class, 'attendance'])->name('employee.attendance');
+    Route::post('/employee-dashboard/attendance/check-in', [EmployeeHomePageController::class, 'checkIn'])->name('employee.attendance.check-in');
+    Route::post('/employee-dashboard/attendance/check-out', [EmployeeHomePageController::class, 'checkOut'])->name('employee.attendance.check-out');
     Route::get('/employee-dashboard/outdoor', [EmployeeHomePageController::class, 'outdoor'])->name('employee.outdoor');
     Route::get('/employee-dashboard/requests', [EmployeeHomePageController::class, 'requests'])->name('employee.requests.index');
     Route::put('/employee-dashboard/requests/{clientRequest}/status', [EmployeeHomePageController::class, 'updateRequestStatus'])->name('employee.requests.update-status');
     Route::get('/employee-dashboard/notifications', [EmployeeHomePageController::class, 'notifications'])->name('employee.notifications');
+    Route::post('/employee-dashboard/notifications/{id}/mark-read', [EmployeeHomePageController::class, 'markAsRead'])->name('employee.notifications.mark-read');
+    Route::post('/employee-dashboard/notifications/mark-all-read', [EmployeeHomePageController::class, 'markAllAsRead'])->name('employee.notifications.mark-all-read');
     Route::get('/employee-dashboard/setting', [EmployeeHomePageController::class, 'setting'])->name('employee.container.setting.index');
     Route::put('/employee-dashboard/setting/{id}', [EmployeeHomePageController::class, 'updateSetting'])->name('employee.container.setting.update');
     Route::delete('/employee-dashboard/setting/session/{id}', [EmployeeHomePageController::class, 'logoutSession'])->name('employee.setting.logout-session');

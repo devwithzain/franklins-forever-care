@@ -13,7 +13,7 @@ class NotificationService
     /**
      * Create a notification for unassigned booking
      */
-    public function notifyUnassignedBooking(ServiceBooking $booking): AdminNotification
+    public function notifyUnassignedBooking(ServiceBooking $booking, ?int $userId = null): AdminNotification
     {
         return AdminNotification::create([
             'type' => 'unassigned_booking',
@@ -28,13 +28,14 @@ class NotificationService
                 'amount' => $booking->amount,
             ],
             'is_read' => false,
+            'user_id' => $userId,
         ]);
     }
 
     /**
      * Create a notification for pending client request
      */
-    public function notifyPendingRequest($request): AdminNotification
+    public function notifyPendingRequest($request, ?int $userId = null): AdminNotification
     {
         $requestType = match($request->type) {
             'change_agent' => 'Agent Change Request',
@@ -54,13 +55,14 @@ class NotificationService
                 'details' => $request->details,
             ],
             'is_read' => false,
+            'user_id' => $userId,
         ]);
     }
 
     /**
      * Create a notification for payment overdue
      */
-    public function notifyPaymentOverdue(ServiceBooking $booking): AdminNotification
+    public function notifyPaymentOverdue(ServiceBooking $booking, ?int $userId = null): AdminNotification
     {
         return AdminNotification::create([
             'type' => 'payment_overdue',
@@ -74,6 +76,7 @@ class NotificationService
                 'payment_status' => $booking->payment_status,
             ],
             'is_read' => false,
+            'user_id' => $userId,
         ]);
     }
 
@@ -84,8 +87,8 @@ class NotificationService
     {
         return AdminNotification::create([
             'type' => 'agent_assigned',
-            'title' => 'Agent Assigned to Booking',
-            'message' => "{$agent->name} has been assigned to {$booking->patient_name}.",
+            'title' => 'New Booking Assigned',
+            'message' => "You have been assigned to {$booking->patient_name}.",
             'data' => [
                 'booking_id' => $booking->id,
                 'agent_id' => $agent->id,
@@ -94,7 +97,60 @@ class NotificationService
                 'booking_date' => $booking->preferred_date?->format('Y-m-d'),
             ],
             'is_read' => false,
+            'user_id' => $agent->id,
         ]);
+    }
+
+    /**
+     * Create a broadcast notification for all users
+     */
+    public function notifyBroadcast($broadcast): void
+    {
+        $audience = $broadcast->audience;
+        $usersQuery = User::query();
+        
+        if ($audience !== 'all') {
+            $usersQuery->where('role', $audience);
+        }
+        
+        $users = $usersQuery->get();
+        
+        foreach ($users as $user) {
+            AdminNotification::create([
+                'type' => 'broadcast',
+                'title' => 'Announcement',
+                'message' => $broadcast->message,
+                'data' => [
+                    'broadcast_id' => $broadcast->id,
+                    'sender_id' => $broadcast->sender_id,
+                ],
+                'is_read' => false,
+                'user_id' => $user->id,
+            ]);
+        }
+    }
+
+    /**
+     * Get unread notifications count for a specific user
+     */
+    public function getUnreadCountForUser(?int $userId = null): array
+    {
+        $query = AdminNotification::unread();
+        
+        if ($userId) {
+            $query->where('user_id', $userId);
+        } else {
+            $query->whereNull('user_id');
+        }
+        
+        return [
+            'total' => (clone $query)->count(),
+            'unassigned_bookings' => (clone $query)->byType('unassigned_booking')->count(),
+            'pending_requests' => (clone $query)->byType('pending_request')->count(),
+            'payment_overdue' => (clone $query)->byType('payment_overdue')->count(),
+            'agent_assigned' => (clone $query)->byType('agent_assigned')->count(),
+            'broadcast' => (clone $query)->byType('broadcast')->count(),
+        ];
     }
 
     /**
@@ -102,13 +158,23 @@ class NotificationService
      */
     public function getUnreadCount(): array
     {
-        return [
-            'total' => AdminNotification::unread()->count(),
-            'unassigned_bookings' => AdminNotification::unread()->byType('unassigned_booking')->count(),
-            'pending_requests' => AdminNotification::unread()->byType('pending_request')->count(),
-            'payment_overdue' => AdminNotification::unread()->byType('payment_overdue')->count(),
-            'agent_assigned' => AdminNotification::unread()->byType('agent_assigned')->count(),
-        ];
+        return $this->getUnreadCountForUser();
+    }
+
+    /**
+     * Get recent unread notifications for a specific user
+     */
+    public function getRecentUnreadForUser(int $limit = 10, ?int $userId = null)
+    {
+        $query = AdminNotification::unread();
+        
+        if ($userId) {
+            $query->where('user_id', $userId);
+        } else {
+            $query->whereNull('user_id');
+        }
+        
+        return $query->latest()->limit($limit)->get();
     }
 
     /**
@@ -116,18 +182,37 @@ class NotificationService
      */
     public function getRecentUnread(int $limit = 10)
     {
-        return AdminNotification::unread()
-            ->latest()
-            ->limit($limit)
-            ->get();
+        return $this->getRecentUnreadForUser($limit);
+    }
+
+    /**
+     * Get all notifications for a specific user
+     */
+    public function getAllForUser(?int $userId = null, int $limit = 20)
+    {
+        $query = AdminNotification::query();
+        
+        if ($userId) {
+            $query->where('user_id', $userId);
+        } else {
+            $query->whereNull('user_id');
+        }
+        
+        return $query->latest()->paginate($limit);
     }
 
     /**
      * Mark notification as read
      */
-    public function markAsRead(int $notificationId): bool
+    public function markAsRead(int $notificationId, ?int $userId = null): bool
     {
-        $notification = AdminNotification::find($notificationId);
+        $query = AdminNotification::where('id', $notificationId);
+        
+        if ($userId) {
+            $query->where('user_id', $userId);
+        }
+        
+        $notification = $query->first();
         if ($notification) {
             $notification->markAsRead();
             return true;
@@ -136,10 +221,26 @@ class NotificationService
     }
 
     /**
+     * Mark all notifications as read for a specific user
+     */
+    public function markAllAsReadForUser(?int $userId = null): int
+    {
+        $query = AdminNotification::where('is_read', false);
+        
+        if ($userId) {
+            $query->where('user_id', $userId);
+        } else {
+            $query->whereNull('user_id');
+        }
+        
+        return $query->update(['is_read' => true]);
+    }
+
+    /**
      * Mark all notifications as read
      */
     public function markAllAsRead(): int
     {
-        return AdminNotification::where('is_read', false)->update(['is_read' => true]);
+        return $this->markAllAsReadForUser();
     }
 }

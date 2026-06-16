@@ -21,12 +21,12 @@
             class="relative w-[38px] h-[38px] rounded-full border border-theme-border bg-theme-card cursor-pointer flex items-center justify-center hover:bg-theme-hover transition-colors text-theme-muted hover:text-theme-main">
             <svg x-show="!darkMode" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                    d="M20.354 15.354A9 9 0 018.646 3.646A9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
             </svg>
             <svg x-show="darkMode" style="display: none;" class="w-5 h-5" fill="none" stroke="currentColor"
                 viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z">
+                    d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z">
                 </path>
             </svg>
         </button>
@@ -34,34 +34,58 @@
             <button @click="open = !open"
                 class="relative w-[38px] h-[38px] rounded-full border border-theme-border bg-theme-card cursor-pointer flex items-center justify-center hover:bg-theme-hover transition-colors text-theme-muted hover:text-theme-main">
                 <svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                    <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                    <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                    <path d="M13.73 21a2 2 0 01-3.46 0" />
                 </svg>
-                <span class="absolute top-[7px] right-2 w-2 h-2 bg-[#e63b3b] rounded-full border-2 border-white"></span>
+                @if(isset($notificationCounts) && $notificationCounts['total'] > 0)
+                <span class="absolute top-[7px] right-2 w-5 h-5 bg-[#e63b3b] rounded-full border-2 border-white flex items-center justify-center text-[10px] text-white font-bold">
+                    {{ $notificationCounts['total'] > 99 ? '99+' : $notificationCounts['total'] }}
+                </span>
+                @endif
             </button>
             <div x-show="open" @click.outside="open = false" x-transition
-                class="absolute top-[54px] right-0 w-[340px] bg-theme-card rounded-[14px] border border-theme-border shadow-[0_8px_32px_rgba(0,0,0,0.12)] z-[500] text-theme-main">
-                <div class="flex items-center justify-between px-[18px] py-4 border-b border-theme-border">
+                class="absolute top-[54px] right-0 w-[340px] bg-white rounded-[14px] border border-slate-200 shadow-[0_8px_32px_rgba(0,0,0,0.12)] z-[500] text-slate-800">
+                <div class="flex items-center justify-between px-[18px] py-4 border-b border-slate-200">
                     <h4 class="text-[14px] font-extrabold flex items-center gap-2">
                         Notifications
-                        <span class="bg-[#fee2e2] text-[#e63b3b] px-[7px] py-0.5 rounded-full text-[11px]">5 New</span>
+                        @if(isset($notificationCounts) && $notificationCounts['total'] > 0)
+                        <span class="bg-[#fee2e2] text-[#e63b3b] px-[7px] py-0.5 rounded-full text-[11px]">
+                            {{ $notificationCounts['total'] }} New
+                        </span>
+                        @endif
                     </h4>
                 </div>
                 <div class="max-h-[340px] overflow-y-auto">
+                    @if(isset($recentNotifications) && $recentNotifications->count() > 0)
+                    @foreach($recentNotifications as $notification)
                     <div
-                        class="flex gap-[11px] px-[18px] py-[13px] border-b border-theme-border cursor-pointer hover:bg-theme-hover transition-colors bg-theme-bg">
-                        <div class="w-2 h-2 rounded-full mt-1.5 flex-shrink-0 bg-theme-primary"></div>
-                        <div>
-                            <div class="text-[12.5px] text-theme-main leading-relaxed"><b>Arthur
-                                    Morgan</b>
-                                has completed
-                                therapy session today.</div>
-                            <div class="text-[11px] text-slate-400 mt-0.5">2 minutes ago</div>
+                        class="flex gap-[11px] px-[18px] py-[13px] border-b border-slate-200 cursor-pointer hover:bg-slate-50 transition-colors {{ !$notification->is_read ? 'bg-slate-50' : '' }}">
+                        @if(!$notification->is_read)
+                        <div class="w-2 h-2 rounded-full mt-1.5 flex-shrink-0 bg-[#1a3cdc]"></div>
+                        @else
+                        <div class="w-2 h-2 rounded-full mt-1.5 flex-shrink-0 opacity-0"></div>
+                        @endif
+                        <div class="flex-1">
+                            <div class="text-[12.5px] text-slate-800 leading-relaxed font-medium">
+                                {{ $notification->title }}
+                            </div>
+                            <div class="text-[12.5px] text-slate-500 leading-relaxed mt-1">
+                                {{ Str::limit($notification->message, 50) }}
+                            </div>
+                            <div class="text-[11px] text-slate-400 mt-0.5">
+                                {{ $notification->created_at->diffForHumans() }}
+                            </div>
                         </div>
                     </div>
+                    @endforeach
+                    @else
+                    <div class="px-[18px] py-[26px] text-center text-slate-400">
+                        <p>No notifications yet</p>
+                    </div>
+                    @endif
                 </div>
                 <a href="{{ Auth::user()->role === 'employee' ? route('employee.notifications') : (Auth::user()->role === 'client' ? route('client.notifications') : route('admin.notifications')) }}"
-                    class="px-[18px] py-3 text-center text-[13px] text-theme-primary font-semibold cursor-pointer hover:bg-theme-hover rounded-b-[14px] block">See
+                    class="px-[18px] py-3 text-center text-[13px] text-[#1a3cdc] font-semibold cursor-pointer hover:bg-slate-50 rounded-b-[14px] block">See
                     All Notifications →
                 </a>
             </div>

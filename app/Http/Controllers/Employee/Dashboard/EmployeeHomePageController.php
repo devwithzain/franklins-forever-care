@@ -5,38 +5,37 @@ namespace App\Http\Controllers\Employee\Dashboard;
 use App\Models\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Services\NotificationService;
 
 class EmployeeHomePageController extends Controller
 {
+    protected NotificationService $notificationService;
+    
+    public function __construct(NotificationService $notificationService)
+    {
+        $this->notificationService = $notificationService;
+    }
+
     public function index()
     {
         $user = Auth::user();
         $employeeRecord = \App\Models\Employee::where('user_id', $user->id)->first();
         $application = \App\Models\CareerApplication::where('user_id', $user->id)->latest()->first();
 
-        // 1. Auto-check-in if logged in (ensure single record per day)
+        // Get notifications
+        $notificationCounts = $this->notificationService->getUnreadCountForUser($user->id);
+        $recentNotifications = $this->notificationService->getRecentUnreadForUser(5, $user->id);
+
+        // FIX 1: Removed auto check-in. Just fetch today's attendance if it exists.
         $todayAttendance = null;
         if ($employeeRecord) {
             $today = \Carbon\Carbon::today();
-            $exists = \App\Models\Attendance::where('employee_id', $employeeRecord->id)
+            $todayAttendance = \App\Models\Attendance::where('employee_id', $employeeRecord->id)
                 ->whereDate('check_in', $today->toDateString())
-                ->exists();
-
-            if ($exists) {
-                $todayAttendance = \App\Models\Attendance::where('employee_id', $employeeRecord->id)
-                    ->whereDate('check_in', $today->toDateString())
-                    ->first();
-            } else {
-                $todayAttendance = \App\Models\Attendance::create([
-                    'employee_id' => $employeeRecord->id,
-                    'check_in' => now(),
-                    'status' => 'Present',
-                    'note' => 'Automatic dashboard check-in'
-                ]);
-            }
+                ->first();
         }
 
-        // 2. Fetch weekly logs with detailed information
+        // Fetch weekly logs with detailed information
         $weeklyAttendance = [];
         if ($employeeRecord) {
             $startOfWeek = \Carbon\Carbon::now()->startOfWeek();
@@ -104,7 +103,7 @@ class EmployeeHomePageController extends Controller
             }
         }
 
-        // 3. Fetch recent requests/activity from assigned clients
+        // Fetch recent requests/activity from assigned clients
         $recentActivity = [];
         if ($employeeRecord) {
             $recentActivity = \App\Models\ClientRequest::whereHas('client', function ($q) use ($user) {
@@ -147,6 +146,8 @@ class EmployeeHomePageController extends Controller
             'recentActivity' => $recentActivity,
             'todayAttendance' => $todayAttendance,
             'currentDateTime' => \Carbon\Carbon::now(),
+            'notificationCounts' => $notificationCounts,
+            'recentNotifications' => $recentNotifications,
         ]);
     }
 
@@ -187,6 +188,10 @@ class EmployeeHomePageController extends Controller
                 'absentToday' => 1,
                 'onLeaveCount' => 0,
                 'attendances' => collect(),
+                'attendanceToday' => null,
+                'monthlyAttendance' => [],
+                'currentMonth' => \Carbon\Carbon::now(),
+                'employeeRecord' => null,
             ]);
         }
 
@@ -215,7 +220,116 @@ class EmployeeHomePageController extends Controller
             ->orderBy('check_in', 'desc')
             ->get();
 
-        return view('employee.container.attendance.index', compact('presentToday', 'lateToday', 'absentToday', 'onLeaveCount', 'attendances'));
+        // Generate monthly attendance calendar
+        $currentMonth = \Carbon\Carbon::now();
+        $monthlyAttendance = [];
+        $daysInMonth = $currentMonth->daysInMonth;
+        $attendanceByDate = $attendances->keyBy(function ($item) {
+            return \Carbon\Carbon::parse($item->check_in)->toDateString();
+        });
+
+        for ($day = 1; $day <= $daysInMonth; $day++) {
+            $date = $currentMonth->copy()->day($day);
+            $dateStr = $date->toDateString();
+            $isWeekend = $date->isWeekend();
+            $attendance = $attendanceByDate->get($dateStr);
+            $isFuture = $date->isFuture(); // FIX 2: detect future dates
+
+            if ($isWeekend) {
+                $status = 'OFF';
+            } elseif ($attendance) {
+                $status = $attendance->status;
+            } elseif ($isFuture || $date->isToday() && !$attendance) {
+                // FIX 2: future days and today (if no check-in yet) show as blank/upcoming, not Absent
+                $status = 'Upcoming';
+            } else {
+                // Only past weekdays with no record are truly Absent
+                $status = 'Absent';
+            }
+
+            $monthlyAttendance[] = [
+                'day' => $day,
+                'date' => $date,
+                'isWeekend' => $isWeekend,
+                'isFuture' => $isFuture,
+                'status' => $status,
+                'attendance' => $attendance,
+                'isToday' => $date->isToday(),
+            ];
+        }
+
+        return view('employee.container.attendance.index', compact(
+            'presentToday',
+            'lateToday',
+            'absentToday',
+            'onLeaveCount',
+            'attendances',
+            'attendanceToday',
+            'monthlyAttendance',
+            'currentMonth',
+            'employeeRecord'
+        ));
+    }
+
+    public function checkIn()
+    {
+        $user = Auth::user();
+        $employeeRecord = \App\Models\Employee::where('user_id', $user->id)->first();
+
+        if (!$employeeRecord) {
+            return redirect()->back()->with('error', 'Employee record not found.');
+        }
+
+        $today = \Carbon\Carbon::today();
+        $exists = \App\Models\Attendance::where('employee_id', $employeeRecord->id)
+            ->whereDate('check_in', $today->toDateString())
+            ->exists();
+
+        if ($exists) {
+            return redirect()->back()->with('error', 'You have already checked in today.');
+        }
+
+        $checkIn = now();
+        $lateThreshold = \Carbon\Carbon::today()->setTime(9, 15);
+        $status = $checkIn->greaterThan($lateThreshold) ? 'Late' : 'Present';
+
+        \App\Models\Attendance::create([
+            'employee_id' => $employeeRecord->id,
+            'check_in' => $checkIn,
+            'status' => $status,
+            'note' => 'Manual check-in'
+        ]);
+
+        return redirect()->back()->with('success', 'Checked in successfully at ' . $checkIn->format('h:i A'));
+    }
+
+    public function checkOut()
+    {
+        $user = Auth::user();
+        $employeeRecord = \App\Models\Employee::where('user_id', $user->id)->first();
+
+        if (!$employeeRecord) {
+            return redirect()->back()->with('error', 'Employee record not found.');
+        }
+
+        $today = \Carbon\Carbon::today();
+        $attendance = \App\Models\Attendance::where('employee_id', $employeeRecord->id)
+            ->whereDate('check_in', $today->toDateString())
+            ->first();
+
+        if (!$attendance) {
+            return redirect()->back()->with('error', 'You need to check in first.');
+        }
+
+        if ($attendance->check_out) {
+            return redirect()->back()->with('error', 'You have already checked out today.');
+        }
+
+        $attendance->update([
+            'check_out' => now()
+        ]);
+
+        return redirect()->back()->with('success', 'Checked out successfully at ' . now()->format('h:i A'));
     }
 
     public function outdoor()
@@ -252,8 +366,24 @@ class EmployeeHomePageController extends Controller
 
     public function notifications()
     {
-        $broadcasts = \App\Models\Broadcast::with('sender')->latest()->paginate(10);
-        return view('employee.container.notifications.index', compact('broadcasts'));
+        $user = Auth::user();
+        $notifications = $this->notificationService->getAllForUser($user->id);
+        $notificationCounts = $this->notificationService->getUnreadCountForUser($user->id);
+        return view('employee.container.notifications.index', compact('notifications', 'notificationCounts'));
+    }
+    
+    public function markAsRead($id)
+    {
+        $user = Auth::user();
+        $this->notificationService->markAsRead($id, $user->id);
+        return redirect()->back()->with('success', 'Notification marked as read.');
+    }
+    
+    public function markAllAsRead()
+    {
+        $user = Auth::user();
+        $this->notificationService->markAllAsReadForUser($user->id);
+        return redirect()->back()->with('success', 'All notifications marked as read.');
     }
 
     public function setting()
@@ -340,12 +470,10 @@ class EmployeeHomePageController extends Controller
     {
         $user = Auth::user();
 
-        // Ensure the request belongs to a client assigned to this employee
         if ($clientRequest->client->agent_id !== $user->id) {
             abort(403, 'Unauthorized access.');
         }
 
-        // Restrict updates to only Care-related/General/Outdoor requests
         $allowedTypes = ['General Support', 'Outdoor Access'];
         if (!in_array($clientRequest->type, $allowedTypes)) {
             return redirect()->back()->with('error', 'Only administrative staff can update status for ' . $clientRequest->type . ' requests.');
