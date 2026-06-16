@@ -10,10 +10,22 @@ class OutdoorActivity extends Model
         'employee_id',
         'client_id',
         'activity_name',
+        'activity_type',
         'start_time',
         'end_time',
         'status',
         'location',
+        'notes',
+        'report_summary',
+        'report_participation_level',
+        'report_outcome_notes',
+        'report_follow_up_recommendations',
+        'duration_minutes',
+    ];
+
+    protected $casts = [
+        'start_time' => 'datetime',
+        'end_time' => 'datetime',
     ];
 
     public function employee()

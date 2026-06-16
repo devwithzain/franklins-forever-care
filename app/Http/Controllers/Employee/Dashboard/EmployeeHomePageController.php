@@ -334,7 +334,59 @@ class EmployeeHomePageController extends Controller
 
     public function outdoor()
     {
-        return view('employee.container.outdoor.index');
+        $user = Auth::user();
+        $employee = \App\Models\Employee::where('user_id', $user->id)->firstOrFail();
+
+        // 1. Get current active session
+        $activeSession = \App\Models\OutdoorActivity::with(['client.user'])
+            ->where('employee_id', $employee->id)
+            ->where('status', 'Active')
+            ->first();
+
+        // 2. Metrics Calculation
+        // Total Today = Number of sessions started today.
+        $totalToday = \App\Models\OutdoorActivity::where('employee_id', $employee->id)
+            ->whereDate('start_time', \Carbon\Carbon::today())
+            ->count();
+
+        // Active Now = Number of currently active sessions.
+        $activeNow = $activeSession ? 1 : 0;
+
+        // Avg Duration = Average duration of completed sessions.
+        $completedSessions = \App\Models\OutdoorActivity::where('employee_id', $employee->id)
+            ->where('status', 'Completed')
+            ->whereNotNull('end_time')
+            ->get();
+
+        $totalMinutes = 0;
+        foreach ($completedSessions as $session) {
+            $totalMinutes += $session->duration_minutes ?? $session->start_time->diffInMinutes($session->end_time);
+        }
+        $avgDuration = $completedSessions->count() > 0 ? round($totalMinutes / $completedSessions->count()) : 0;
+
+        // Reports Filed = Number of completed activity reports submitted (which equals completed sessions here)
+        $reportsFiled = $completedSessions->count();
+
+        // 3. Client Selection (only assigned to the employee)
+        $clients = \App\Models\Client::with('user')
+            ->where('agent_id', $user->id)
+            ->get();
+
+        // 4. Session History Log (recent completed sessions)
+        $history = \App\Models\OutdoorActivity::with(['client.user'])
+            ->where('employee_id', $employee->id)
+            ->latest('start_time')
+            ->get();
+
+        return view('employee.container.outdoor.index', compact(
+            'activeSession',
+            'activeNow',
+            'totalToday',
+            'avgDuration',
+            'reportsFiled',
+            'clients',
+            'history'
+        ));
     }
 
     public function requests(\Illuminate\Http\Request $request)
