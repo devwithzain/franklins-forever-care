@@ -16,6 +16,8 @@ use App\Http\Controllers\Admin\Dashboard\AdminHomePageController;
 
 // Auth Controllers
 use App\Http\Controllers\Auth\RegisteredUserController;
+
+use App\Http\Controllers\Admin\BookingManagementController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 
 // Employee Controllers
@@ -71,6 +73,9 @@ Route::get('/service/{slug}', [ServiceDetailController::class, 'index'])->name('
 
 // Service Booking / Checkout routes (Authenticated)
 Route::middleware(['auth'])->group(function () {
+    Route::post('/notifications/mark-all-as-read', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-as-read');
+    Route::post('/notifications/{id}/mark-as-read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.mark-as-read');
+
     Route::get('/service-checkout/{slug}', [ServiceBookingController::class, 'checkout'])->name('service.checkout');
     Route::post('/service-checkout', [ServiceBookingController::class, 'store'])->name('service.booking.store');
     Route::get('/service-booking/success/{id}', [ServiceBookingController::class, 'success'])->name('service.booking.success');
@@ -102,6 +107,15 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::post('/dashboard/notifications/{id}/mark-read', [AdminHomePageController::class, 'markAsRead'])->name('admin.notifications.mark-read');
     Route::post('/dashboard/notifications/mark-all-read', [AdminHomePageController::class, 'markAllAsRead'])->name('admin.notifications.mark-all-read');
     Route::get('/dashboard/reports', [AdminHomePageController::class, 'reports'])->name('admin.reports');
+
+    // Booking Management Routes
+    Route::get('/dashboard/bookings', [BookingManagementController::class, 'index'])->name('admin.bookings.index');
+    Route::get('/dashboard/bookings/{booking}', [BookingManagementController::class, 'show'])->name('admin.bookings.show');
+    Route::get('/dashboard/bookings/{booking}/assign', [BookingManagementController::class, 'assignPage'])->name('admin.bookings.assign');
+    Route::post('/dashboard/bookings/{booking}/assign', [BookingManagementController::class, 'assign'])->name('admin.bookings.assign.store');
+    Route::post('/dashboard/bookings/{booking}/auto-assign', [BookingManagementController::class, 'autoAssign'])->name('admin.bookings.auto-assign');
+    Route::post('/dashboard/bookings/bulk-auto-assign', [BookingManagementController::class, 'bulkAutoAssign'])->name('admin.bookings.bulk-auto-assign');
+    Route::put('/dashboard/bookings/{booking}/status', [BookingManagementController::class, 'updateStatus'])->name('admin.bookings.update-status');
 
     // Dynamic Content Routes
     Route::resource('/dashboard/services', ServiceController::class)->names('admin.services');

@@ -53,10 +53,10 @@ class AdminHomePageController extends Controller
          ->get();
 
       // Get notification counts
-      $notificationCounts = $this->notificationService->getUnreadCount();
+      $notificationCounts = $this->notificationService->getUnreadCount(auth()->user());
 
       // Get recent unread notifications
-      $recentNotifications = $this->notificationService->getRecentUnread(5);
+      $recentNotifications = $this->notificationService->getRecentUnread(auth()->user(), 5);
 
       // Get workload stats
       $workloadStats = $this->workloadService->getWorkloadStats();
@@ -146,12 +146,20 @@ class AdminHomePageController extends Controller
    }
 
    public function notifications()
+<<<<<<< HEAD
     {
         $broadcasts = Broadcast::with('sender')->latest()->paginate(10);
         $notifications = $this->notificationService->getAllForUser(null);
         $notificationCounts = $this->notificationService->getUnreadCountForUser(null);
         return view('admin.container.notifications.index', compact('broadcasts', 'notifications', 'notificationCounts'));
     }
+=======
+   {
+      $broadcasts = Broadcast::with('sender')->latest()->paginate(10);
+      $notifications = auth()->user()->notifications()->latest()->paginate(10);
+      return view('admin.container.notifications.index', compact('broadcasts', 'notifications'));
+   }
+>>>>>>> 2d3fa374d412d382cfae29cceed31efb73144935
 
     public function storeBroadcast(Request $request)
     {

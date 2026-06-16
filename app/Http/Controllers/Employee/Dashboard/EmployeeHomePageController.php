@@ -366,24 +366,9 @@ class EmployeeHomePageController extends Controller
 
     public function notifications()
     {
-        $user = Auth::user();
-        $notifications = $this->notificationService->getAllForUser($user->id);
-        $notificationCounts = $this->notificationService->getUnreadCountForUser($user->id);
-        return view('employee.container.notifications.index', compact('notifications', 'notificationCounts'));
-    }
-    
-    public function markAsRead($id)
-    {
-        $user = Auth::user();
-        $this->notificationService->markAsRead($id, $user->id);
-        return redirect()->back()->with('success', 'Notification marked as read.');
-    }
-    
-    public function markAllAsRead()
-    {
-        $user = Auth::user();
-        $this->notificationService->markAllAsReadForUser($user->id);
-        return redirect()->back()->with('success', 'All notifications marked as read.');
+        $broadcasts = \App\Models\Broadcast::with('sender')->latest()->paginate(10);
+        $notifications = Auth::user()->notifications()->latest()->paginate(10);
+        return view('employee.container.notifications.index', compact('broadcasts', 'notifications'));
     }
 
     public function setting()
