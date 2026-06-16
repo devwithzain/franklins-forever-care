@@ -340,22 +340,6 @@
             </a>
          </div>
       </div>
-      <div class="mb-8">
-         <div class="px-3 mb-3 text-[10px] font-extrabold text-slate-400 uppercase tracking-[0.15em]">Support</div>
-         <div class="space-y-1">
-            <a href="{{ route('employee.requests.index') }}"
-               class="flex items-center justify-between px-3 py-2.5 rounded-[10px] {{ Request::routeIs('employee.requests.*') ? 'bg-theme-primary text-white shadow-md' : 'text-theme-muted hover:bg-theme-hover' }} transition-all group">
-               <div class="flex items-center gap-3">
-                  <svg
-                     class="w-[18px] h-[18px] {{ Request::routeIs('employee.requests.*') ? 'text-white' : 'text-slate-400 group-hover:text-slate-600' }}"
-                     fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                  </svg>
-                  <span class="text-[13.5px] font-bold">Client Requests</span>
-               </div>
-            </a>
-         </div>
-      </div>
       @endif
       <div>
          <div class="px-3 mb-3 text-[10px] font-extrabold text-slate-400 uppercase tracking-[0.15em]">System</div>

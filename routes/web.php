@@ -158,8 +158,6 @@ Route::middleware(['auth', 'employee'])->group(function () {
     Route::get('/employee-dashboard/outdoor', [EmployeeHomePageController::class, 'outdoor'])->name('employee.outdoor');
     Route::post('/employee-dashboard/outdoor/start', [OutdoorSessionController::class, 'store'])->name('employee.outdoor.start');
     Route::post('/employee-dashboard/outdoor/{id}/stop', [OutdoorSessionController::class, 'stop'])->name('employee.outdoor.stop');
-    Route::get('/employee-dashboard/requests', [EmployeeHomePageController::class, 'requests'])->name('employee.requests.index');
-    Route::put('/employee-dashboard/requests/{clientRequest}/status', [EmployeeHomePageController::class, 'updateRequestStatus'])->name('employee.requests.update-status');
     Route::get('/employee-dashboard/notifications', [EmployeeHomePageController::class, 'notifications'])->name('employee.notifications');
     Route::post('/employee-dashboard/notifications/{id}/mark-read', [EmployeeHomePageController::class, 'markAsRead'])->name('employee.notifications.mark-read');
     Route::post('/employee-dashboard/notifications/mark-all-read', [EmployeeHomePageController::class, 'markAllAsRead'])->name('employee.notifications.mark-all-read');
