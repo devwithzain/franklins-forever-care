@@ -143,7 +143,7 @@
       </div>
       <div class="flex items-center justify-between gap-4 py-7">
          <p class="smallParagraph text-gray-300">
-            &copy; <span class="text-white font-bold">Franklin's.</span> All Rights Reserved.
+            &copy; <span class="text-white font-bold">Franklin's Home Care</span> All Rights Reserved.
          </p>
          <div class="flex items-center gap-4">
             <a href="{{ route('privacy-policy') }}"
@@ -170,10 +170,10 @@
 </footer>
 
 <script>
-   document.getElementById('scrollToTop').addEventListener('click', function () {
-      window.scrollTo({
-         top: 0,
-         behavior: 'smooth'
-      });
+document.getElementById('scrollToTop').addEventListener('click', function() {
+   window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
    });
+});
 </script>
