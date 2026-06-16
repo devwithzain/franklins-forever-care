@@ -16,6 +16,8 @@ use App\Http\Controllers\Admin\Dashboard\AdminHomePageController;
 
 // Auth Controllers
 use App\Http\Controllers\Auth\RegisteredUserController;
+
+use App\Http\Controllers\Admin\BookingManagementController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 
 // Employee Controllers
@@ -103,6 +105,15 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/dashboard/notifications', [AdminHomePageController::class, 'notifications'])->name('admin.notifications');
     Route::post('/dashboard/notifications/broadcast', [AdminHomePageController::class, 'storeBroadcast'])->name('admin.notifications.broadcast');
     Route::get('/dashboard/reports', [AdminHomePageController::class, 'reports'])->name('admin.reports');
+
+    // Booking Management Routes
+    Route::get('/dashboard/bookings', [BookingManagementController::class, 'index'])->name('admin.bookings.index');
+    Route::get('/dashboard/bookings/{booking}', [BookingManagementController::class, 'show'])->name('admin.bookings.show');
+    Route::get('/dashboard/bookings/{booking}/assign', [BookingManagementController::class, 'assignPage'])->name('admin.bookings.assign');
+    Route::post('/dashboard/bookings/{booking}/assign', [BookingManagementController::class, 'assign'])->name('admin.bookings.assign.store');
+    Route::post('/dashboard/bookings/{booking}/auto-assign', [BookingManagementController::class, 'autoAssign'])->name('admin.bookings.auto-assign');
+    Route::post('/dashboard/bookings/bulk-auto-assign', [BookingManagementController::class, 'bulkAutoAssign'])->name('admin.bookings.bulk-auto-assign');
+    Route::put('/dashboard/bookings/{booking}/status', [BookingManagementController::class, 'updateStatus'])->name('admin.bookings.update-status');
 
     // Dynamic Content Routes
     Route::resource('/dashboard/services', ServiceController::class)->names('admin.services');

@@ -58,6 +58,10 @@ class EmployeeWorkload extends Model
             ->whereIn('status', ['confirmed', 'in_progress'])
             ->count();
 
+        // Set default max_capacity if not set
+        if (is_null($workload->max_capacity)) {
+            $workload->max_capacity = 5; // default
+        }
         $workload->active_bookings = $activeBookings;
         $workload->workload_score = static::calculateWorkloadScore($activeBookings, $workload->max_capacity);
         $workload->save();
