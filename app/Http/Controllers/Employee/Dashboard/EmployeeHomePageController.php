@@ -182,154 +182,139 @@ class EmployeeHomePageController extends Controller
         $employeeRecord = \App\Models\Employee::where('user_id', $user->id)->first();
 
         if (!$employeeRecord) {
-            return view('employee.container.attendance.index', [
-                'presentToday' => 0,
-                'lateToday' => 0,
-                'absentToday' => 1,
-                'onLeaveCount' => 0,
-                'attendances' => collect(),
-                'attendanceToday' => null,
-                'monthlyAttendance' => [],
-                'currentMonth' => \Carbon\Carbon::now(),
-                'employeeRecord' => null,
-            ]);
+            return view('employee.container.attendance.index', ['error' => 'Employee record not found.']);
         }
 
         $today = \Carbon\Carbon::today();
-        $attendanceToday = \App\Models\Attendance::where('employee_id', $employeeRecord->id)
+
+        // Get today's assigned bookings
+        $todaysBookings = \App\Models\ServiceBooking::with(['client', 'user'])
+            ->where('agent_id', $user->id)
+            ->whereDate('booking_date', $today)
+            ->get();
+
+        // Get today's attendance records (one per booking)
+        $todaysAttendances = \App\Models\Attendance::where('employee_id', $employeeRecord->id)
             ->whereDate('check_in', $today)
-            ->first();
+            ->get()
+            ->keyBy('service_booking_id');
 
-        $presentToday = $attendanceToday ? 1 : 0;
-        $lateToday = 0;
-        if ($attendanceToday) {
-            $checkIn = \Carbon\Carbon::parse($attendanceToday->check_in);
-            $lateThreshold = \Carbon\Carbon::today()->setTime(9, 15);
-            $lateToday = $checkIn->greaterThan($lateThreshold) ? 1 : 0;
-        }
-
-        $onLeaveCount = \App\Models\Attendance::where('employee_id', $employeeRecord->id)
-            ->where('status', 'On Leave')
-            ->whereMonth('check_in', \Carbon\Carbon::now()->month)
-            ->count();
-
-        $absentToday = $presentToday ? 0 : 1;
-
-        $attendances = \App\Models\Attendance::where('employee_id', $employeeRecord->id)
-            ->whereBetween('check_in', [\Carbon\Carbon::now()->startOfMonth(), \Carbon\Carbon::now()->endOfMonth()])
+        // Timesheet Data (Current Week)
+        $startOfWeek = \Carbon\Carbon::now()->startOfWeek();
+        $endOfWeek = \Carbon\Carbon::now()->endOfWeek();
+        $weeklyAttendances = \App\Models\Attendance::with(['serviceBooking.user'])
+            ->where('employee_id', $employeeRecord->id)
+            ->whereBetween('check_in', [$startOfWeek, $endOfWeek])
             ->orderBy('check_in', 'desc')
             ->get();
 
-        // Generate monthly attendance calendar
-        $currentMonth = \Carbon\Carbon::now();
-        $monthlyAttendance = [];
-        $daysInMonth = $currentMonth->daysInMonth;
-        $attendanceByDate = $attendances->keyBy(function ($item) {
-            return \Carbon\Carbon::parse($item->check_in)->toDateString();
-        });
-
-        for ($day = 1; $day <= $daysInMonth; $day++) {
-            $date = $currentMonth->copy()->day($day);
-            $dateStr = $date->toDateString();
-            $isWeekend = $date->isWeekend();
-            $attendance = $attendanceByDate->get($dateStr);
-            $isFuture = $date->isFuture(); // FIX 2: detect future dates
-
-            if ($isWeekend) {
-                $status = 'OFF';
-            } elseif ($attendance) {
-                $status = $attendance->status;
-            } elseif ($isFuture || $date->isToday() && !$attendance) {
-                // FIX 2: future days and today (if no check-in yet) show as blank/upcoming, not Absent
-                $status = 'Upcoming';
-            } else {
-                // Only past weekdays with no record are truly Absent
-                $status = 'Absent';
+        $totalMinutesThisWeek = 0;
+        $completedVisitsThisWeek = 0;
+        foreach ($weeklyAttendances as $att) {
+            if ($att->check_out) {
+                $totalMinutesThisWeek += $att->check_in->diffInMinutes($att->check_out);
+                $completedVisitsThisWeek++;
             }
-
-            $monthlyAttendance[] = [
-                'day' => $day,
-                'date' => $date,
-                'isWeekend' => $isWeekend,
-                'isFuture' => $isFuture,
-                'status' => $status,
-                'attendance' => $attendance,
-                'isToday' => $date->isToday(),
-            ];
         }
+        $totalHoursThisWeek = round($totalMinutesThisWeek / 60, 1);
+
+        // Get past incomplete punches (missing checkout from previous days)
+        $missedPunches = \App\Models\Attendance::with(['serviceBooking.user'])
+            ->where('employee_id', $employeeRecord->id)
+            ->whereNull('check_out')
+            ->whereDate('check_in', '<', $today)
+            ->where('status', '!=', 'Pending Review')
+            ->get();
 
         return view('employee.container.attendance.index', compact(
-            'presentToday',
-            'lateToday',
-            'absentToday',
-            'onLeaveCount',
-            'attendances',
-            'attendanceToday',
-            'monthlyAttendance',
-            'currentMonth',
-            'employeeRecord'
+            'todaysBookings',
+            'todaysAttendances',
+            'weeklyAttendances',
+            'totalHoursThisWeek',
+            'completedVisitsThisWeek',
+            'missedPunches'
         ));
     }
 
-    public function checkIn()
+    public function checkIn(\Illuminate\Http\Request $request, $booking_id)
     {
         $user = Auth::user();
-        $employeeRecord = \App\Models\Employee::where('user_id', $user->id)->first();
+        $employeeRecord = \App\Models\Employee::where('user_id', $user->id)->firstOrFail();
 
-        if (!$employeeRecord) {
-            return redirect()->back()->with('error', 'Employee record not found.');
+        $booking = \App\Models\ServiceBooking::findOrFail($booking_id);
+        if ($booking->agent_id !== $user->id) {
+            return response()->json(['error' => 'You are not assigned to this booking.'], 403);
         }
 
-        $today = \Carbon\Carbon::today();
-        $exists = \App\Models\Attendance::where('employee_id', $employeeRecord->id)
-            ->whereDate('check_in', $today->toDateString())
-            ->exists();
-
-        if ($exists) {
-            return redirect()->back()->with('error', 'You have already checked in today.');
-        }
-
-        $checkIn = now();
-        $lateThreshold = \Carbon\Carbon::today()->setTime(9, 15);
-        $status = $checkIn->greaterThan($lateThreshold) ? 'Late' : 'Present';
-
-        \App\Models\Attendance::create([
-            'employee_id' => $employeeRecord->id,
-            'check_in' => $checkIn,
-            'status' => $status,
-            'note' => 'Manual check-in'
-        ]);
-
-        return redirect()->back()->with('success', 'Checked in successfully at ' . $checkIn->format('h:i A'));
-    }
-
-    public function checkOut()
-    {
-        $user = Auth::user();
-        $employeeRecord = \App\Models\Employee::where('user_id', $user->id)->first();
-
-        if (!$employeeRecord) {
-            return redirect()->back()->with('error', 'Employee record not found.');
-        }
-
-        $today = \Carbon\Carbon::today();
-        $attendance = \App\Models\Attendance::where('employee_id', $employeeRecord->id)
-            ->whereDate('check_in', $today->toDateString())
+        $existingAttendance = \App\Models\Attendance::where('employee_id', $employeeRecord->id)
+            ->where('service_booking_id', $booking->id)
             ->first();
 
-        if (!$attendance) {
-            return redirect()->back()->with('error', 'You need to check in first.');
+        if ($existingAttendance) {
+            return response()->json(['error' => 'You have already checked in for this booking.'], 400);
         }
 
+        // Optional coordinates
+        $lat = $request->input('latitude');
+        $lng = $request->input('longitude');
+
+        // Determine if they are late (e.g. check against a preferred_time if we had one. In this schema we just record Check-in time)
+
+        $attendance = \App\Models\Attendance::create([
+            'employee_id' => $employeeRecord->id,
+            'service_booking_id' => $booking->id,
+            'client_id' => \App\Models\Client::where('user_id', $booking->user_id)->value('id'),
+            'check_in' => now(),
+            'status' => 'Present',
+            'check_in_latitude' => $lat,
+            'check_in_longitude' => $lng,
+        ]);
+
+        return response()->json(['message' => 'Checked in successfully!', 'attendance' => $attendance]);
+    }
+
+    public function checkOut(\Illuminate\Http\Request $request, $attendance_id)
+    {
+        $user = Auth::user();
+        $employeeRecord = \App\Models\Employee::where('user_id', $user->id)->firstOrFail();
+
+        $attendance = \App\Models\Attendance::where('id', $attendance_id)
+            ->where('employee_id', $employeeRecord->id)
+            ->firstOrFail();
+
         if ($attendance->check_out) {
-            return redirect()->back()->with('error', 'You have already checked out today.');
+            return response()->json(['error' => 'You have already checked out of this visit.'], 400);
         }
 
         $attendance->update([
-            'check_out' => now()
+            'check_out' => now(),
+            'check_out_latitude' => $request->input('latitude'),
+            'check_out_longitude' => $request->input('longitude'),
+            'note' => $request->input('note'),
         ]);
 
-        return redirect()->back()->with('success', 'Checked out successfully at ' . now()->format('h:i A'));
+        return response()->json(['message' => 'Checked out successfully!']);
+    }
+
+    public function missedPunch(\Illuminate\Http\Request $request, $attendance_id)
+    {
+        $user = Auth::user();
+        $employeeRecord = \App\Models\Employee::where('user_id', $user->id)->firstOrFail();
+
+        $attendance = \App\Models\Attendance::where('id', $attendance_id)
+            ->where('employee_id', $employeeRecord->id)
+            ->firstOrFail();
+
+        $request->validate([
+            'note' => 'required|string|max:500'
+        ]);
+
+        $attendance->update([
+            'status' => 'Pending Review',
+            'note' => 'Missed Punch Request: ' . $request->note
+        ]);
+
+        return redirect()->back()->with('success', 'Missed punch correction request submitted to Admin.');
     }
 
     public function outdoor()

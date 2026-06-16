@@ -50,13 +50,15 @@
                     <tr>
                         <th class="px-6 py-3 text-[10.5px] font-bold text-theme-text-muted uppercase tracking-widest">Agent
                         </th>
+                        <th class="px-6 py-3 text-[10.5px] font-bold text-theme-text-muted uppercase tracking-widest">Client
+                        </th>
                         <th class="px-6 py-3 text-[10.5px] font-bold text-theme-text-muted uppercase tracking-widest">
                             Check-In</th>
                         <th class="px-6 py-3 text-[10.5px] font-bold text-theme-text-muted uppercase tracking-widest">
                             Check-Out</th>
                         <th class="px-6 py-3 text-[10.5px] font-bold text-theme-text-muted uppercase tracking-widest">Status
                         </th>
-                        <th class="px-6 py-3 text-[10.5px] font-bold text-theme-text-muted uppercase tracking-widest">Date
+                        <th class="px-6 py-3 text-[10.5px] font-bold text-theme-text-muted uppercase tracking-widest">Note
                         </th>
                     </tr>
                 </thead>
@@ -67,21 +69,39 @@
                                 <div class="flex items-center gap-3">
                                     <div
                                         class="w-8 h-8 rounded-full bg-theme-primary-light text-theme-primary flex items-center justify-center font-bold text-[11px]">
-                                        {{ strtoupper(substr($attendance->employee->user->name, 0, 2)) }}
+                                        {{ strtoupper(substr($attendance->employee->user->name ?? 'U', 0, 2)) }}
                                     </div>
                                     <div class="text-[13px] font-bold text-theme-text-main">
-                                        {{ $attendance->employee->user->name }}</div>
+                                        {{ $attendance->employee->user->name ?? 'Unknown' }}</div>
                                 </div>
                             </td>
-                            <td class="px-6 py-4 text-[13px] text-theme-text-main">{{ $attendance->check_in->format('h:i A') }}
+                            <td class="px-6 py-4">
+                                <div class="text-[13px] font-bold text-theme-text-main">
+                                    {{ $attendance->client->user->name ?? 'N/A' }}
+                                </div>
+                                <div class="text-[11px] text-theme-text-muted">
+                                    {{ $attendance->check_in->format('M d, Y') }}
+                                </div>
                             </td>
-                            <td class="px-6 py-4 text-[13px] text-theme-text-main">
-                                {{ $attendance->check_out ? $attendance->check_out->format('h:i A') : '—' }}</td>
+                            <td class="px-6 py-4">
+                                <div class="text-[13px] text-theme-text-main">{{ $attendance->check_in->format('h:i A') }}</div>
+                                @if($attendance->check_in_latitude)
+                                <div class="text-[10px] text-[#1a3cdc] mt-1"><a href="https://maps.google.com/?q={{ $attendance->check_in_latitude }},{{ $attendance->check_in_longitude }}" target="_blank" class="hover:underline">View Map</a></div>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="text-[13px] text-theme-text-main">
+                                    {{ $attendance->check_out ? $attendance->check_out->format('h:i A') : '—' }}
+                                </div>
+                                @if($attendance->check_out_latitude)
+                                <div class="text-[10px] text-[#1a3cdc] mt-1"><a href="https://maps.google.com/?q={{ $attendance->check_out_latitude }},{{ $attendance->check_out_longitude }}" target="_blank" class="hover:underline">View Map</a></div>
+                                @endif
+                            </td>
                             <td class="px-6 py-4">
                                 @php
                                     $statusClasses = [
                                         'Present' => 'bg-green-100 text-green-600',
-                                        'Late' => 'bg-amber-100 text-amber-600',
+                                        'Pending Review' => 'bg-yellow-100 text-yellow-600',
                                         'Absent' => 'bg-red-100 text-red-600',
                                         'On Leave' => 'bg-theme-hover text-theme-text-muted',
                                     ];
@@ -90,8 +110,10 @@
                                 <span
                                     class="px-2 py-0.5 rounded-full {{ $statusClass }} text-[10.5px] font-bold">{{ $attendance->status }}</span>
                             </td>
-                            <td class="px-6 py-4 text-[13px] text-theme-text-muted">
-                                {{ $attendance->check_in->format('M d, Y') }}</td>
+                            <td class="px-6 py-4">
+                                <div class="text-[12px] text-theme-text-muted max-w-[200px] truncate" title="{{ $attendance->note }}">
+                                    {{ $attendance->note ?? '—' }}</div>
+                            </td>
                         </tr>
                     @empty
                         <tr>
