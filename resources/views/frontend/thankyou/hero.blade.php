@@ -1,5 +1,5 @@
 <div class="w-full relative">
-   <img src="{{ asset('assets/inner-page-banner.jpg') }}" alt="About Hero Banner" class="w-full object-cover h-[500px]">
+   <img src="{{ asset('assets/inner-page-banner.webp') }}" alt="About Hero Banner" class="w-full object-cover h-[500px]">
    <div class="absolute inset-0 bg-black/70 z-0"></div>
    <div class="absolute inset-0 z-10 flex items-center justify-center dmserif">
       <span class="heading uppercase text-white font-semibold leading-tight">

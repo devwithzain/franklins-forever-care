@@ -1,5 +1,5 @@
 <div class="w-full relative">
-   <img src="{{ asset('assets/inner-page-banner.jpg') }}" alt="{{ $employee->user->name }}" class="w-full object-cover h-[500px]">
+   <img src="{{ asset('assets/inner-page-banner.webp') }}" alt="{{ $employee->user->name }}" class="w-full object-cover h-[500px]">
    <div class="absolute inset-0 bg-black/75 z-0"></div>
    <div class="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 text-center px-6">
       {{-- Profile Avatar --}}

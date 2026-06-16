@@ -13,7 +13,7 @@
    {{ session('success') }}
 </div>
 @endif
-<div class="grid sm:grid-cols-1 xm:grid-cols-1 grid-cols-3 gap-5 my-5">
+<div class="grid sm:grid-cols-1 xm:grid-cols-1 grid-cols-2 gap-5 my-5">
    <div class="lg:col-span-2 space-y-4">
       <div class="bg-theme-card rounded-[14px] border border-theme-border overflow-hidden shadow-sm">
          <div class="px-6 py-5 border-b border-theme-border flex items-center justify-between">
