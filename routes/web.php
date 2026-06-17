@@ -172,6 +172,8 @@ Route::middleware(['auth', 'client'])->group(function () {
     Route::get('/client-dashboard/requests', [\App\Http\Controllers\Client\Dashboard\ClientHomePageController::class, 'requests'])->name('client.requests.index');
     Route::post('/client-dashboard/requests', [\App\Http\Controllers\Client\Dashboard\ClientHomePageController::class, 'storeRequest'])->name('client.requests.store');
     Route::get('/client-dashboard/care-plan', [\App\Http\Controllers\Client\Dashboard\ClientHomePageController::class, 'carePlan'])->name('client.care-plan');
+    Route::get('/client-dashboard/schedule', [\App\Http\Controllers\Client\Dashboard\ClientHomePageController::class, 'schedule'])->name('client.schedule');
+    Route::get('/client-dashboard/visits', [\App\Http\Controllers\Client\Dashboard\ClientHomePageController::class, 'visits'])->name('client.visits');
     Route::get('/client-dashboard/pca-agent', [\App\Http\Controllers\Client\Dashboard\ClientHomePageController::class, 'pcaAgent'])->name('client.pca-agent');
     Route::post('/client-dashboard/pca-agent/{employee}/rate', [\App\Http\Controllers\Client\Dashboard\ClientHomePageController::class, 'rateAgent'])->name('client.pca-agent.rate');
     Route::get('/client-dashboard/complaints', [\App\Http\Controllers\Client\Dashboard\ClientHomePageController::class, 'complaints'])->name('client.complaints.index');

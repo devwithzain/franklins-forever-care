@@ -202,7 +202,7 @@ class EmployeeHomePageController extends Controller
         // Timesheet Data (Current Week)
         $startOfWeek = \Carbon\Carbon::now()->startOfWeek();
         $endOfWeek = \Carbon\Carbon::now()->endOfWeek();
-        $weeklyAttendances = \App\Models\Attendance::with(['serviceBooking.user'])
+        $weeklyAttendances = \App\Models\Attendance::with(['serviceBooking.client.user'])
             ->where('employee_id', $employeeRecord->id)
             ->whereBetween('check_in', [$startOfWeek, $endOfWeek])
             ->orderBy('check_in', 'desc')

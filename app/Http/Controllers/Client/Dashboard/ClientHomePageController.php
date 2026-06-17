@@ -76,6 +76,49 @@ class ClientHomePageController extends Controller
         return view('client.dashboard.container.care-plan.index', compact('clientRecord', 'activeBookings'));
     }
 
+    public function schedule()
+    {
+        $user = Auth::user();
+        $upcomingBookings = ServiceBooking::with(['service', 'agent'])
+            ->where('user_id', $user->id)
+            ->whereDate('booking_date', '>=', now())
+            ->orderBy('booking_date', 'asc')
+            ->get();
+
+        return view('client.dashboard.container.schedule.index', compact('upcomingBookings'));
+    }
+
+    public function visits()
+    {
+        $user = Auth::user();
+        $clientRecord = Client::where('user_id', $user->id)->first();
+
+        if (!$clientRecord) {
+            abort(404, 'Client record not found.');
+        }
+
+        // Fetch attendance records that have check_out completed, showing PCA Agent details
+        $visits = \App\Models\Attendance::with(['employee.user', 'serviceBooking.service'])
+            ->where('client_id', $clientRecord->id)
+            ->whereNotNull('check_out')
+            ->orderBy('check_in', 'desc')
+            ->get();
+
+        // Also fetch OutdoorActivity records which contain the detailed reports
+        // Since outdoor activities are tied to the client and PCA, we can match them by employee_id and date if needed,
+        // but it's simpler to pass them and look them up, or just eager load them if relations exist.
+        // For now, we will fetch outdoor activities associated with the client to attach the reports to the view.
+        $reports = \App\Models\OutdoorActivity::where('client_id', $clientRecord->id)
+            ->where('status', 'Completed')
+            ->get()
+            ->groupBy(function($report) {
+                // Group by date and employee to match with attendance logs
+                return $report->start_time->format('Y-m-d') . '_' . $report->employee_id;
+            });
+
+        return view('client.dashboard.container.visits.index', compact('visits', 'reports'));
+    }
+
     public function notifications()
     {
         $broadcasts = \App\Models\Broadcast::with('sender')->latest()->paginate(10);
