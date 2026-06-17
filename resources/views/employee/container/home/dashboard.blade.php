@@ -64,7 +64,7 @@
     </div>
 </div>
 
-<div class="grid sm:grid-cols-1 xm:grid-cols-1 grid-cols-3 gap-6 mb-8">
+<div class="grid sm:grid-cols-1 xm:grid-cols-1 grid-cols-2 gap-6 mb-8">
     <div class="bg-white rounded-[14px] p-6 border border-slate-200 shadow-sm">
         <div class="text-slate-400 text-[12px] font-bold uppercase tracking-widest mb-1">Assigned Clients</div>
         <div class="text-3xl font-extrabold text-slate-800">{{ $stats['total_clients'] }}</div>
@@ -74,11 +74,6 @@
         </div>
     </div>
 
-    <div class="bg-white rounded-[14px] p-6 border border-slate-200 shadow-sm">
-        <div class="text-slate-400 text-[12px] font-bold uppercase tracking-widest mb-1">Client Requests</div>
-        <div class="text-3xl font-extrabold text-slate-800">{{ $stats['total_requests'] }}</div>
-        <div class="mt-4 text-amber-500 text-[12px] font-bold uppercase tracking-wide">Pending Action</div>
-    </div>
 
     <div class="bg-white rounded-[14px] p-6 border border-slate-200 shadow-sm">
         <div class="text-slate-400 text-[12px] font-bold uppercase tracking-widest mb-1">Attendance Rating</div>

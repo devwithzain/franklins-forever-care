@@ -374,33 +374,6 @@ class EmployeeHomePageController extends Controller
         ));
     }
 
-    public function requests(\Illuminate\Http\Request $request)
-    {
-        $user = Auth::user();
-        $query = \App\Models\ClientRequest::with(['client.user'])
-            ->whereHas('client', function ($q) use ($user) {
-                $q->where('agent_id', $user->id);
-            })
-            ->latest();
-
-        $activeTab = $request->query('tab', 'all');
-        if ($activeTab !== 'all') {
-            $query->where('type', $activeTab);
-        }
-        $requests = $query->paginate(10)->appends(['tab' => $activeTab]);
-
-        $stats = [
-            'total' => \App\Models\ClientRequest::whereHas('client', function ($q) use ($user) {
-                $q->where('agent_id', $user->id);
-            })->count(),
-            'change_agent' => \App\Models\ClientRequest::where('type', 'Change Agent')->whereHas('client', function ($q) use ($user) {
-                $q->where('agent_id', $user->id);
-            })->count(),
-        ];
-
-        return view('employee.container.requests.index', compact('requests', 'stats', 'activeTab'));
-    }
-
     public function notifications()
     {
         $user = Auth::user();
@@ -504,27 +477,4 @@ class EmployeeHomePageController extends Controller
         return back()->with('success', 'Session terminated successfully.');
     }
 
-    public function updateRequestStatus(\Illuminate\Http\Request $request, \App\Models\ClientRequest $clientRequest)
-    {
-        $user = Auth::user();
-
-        if ($clientRequest->client->agent_id !== $user->id) {
-            abort(403, 'Unauthorized access.');
-        }
-
-        $allowedTypes = ['General Support', 'Outdoor Access'];
-        if (!in_array($clientRequest->type, $allowedTypes)) {
-            return redirect()->back()->with('error', 'Only administrative staff can update status for ' . $clientRequest->type . ' requests.');
-        }
-
-        $request->validate([
-            'status' => 'required|in:Approved,Rejected',
-        ]);
-
-        $clientRequest->update([
-            'status' => $request->status,
-        ]);
-
-        return redirect()->route('employee.requests.index')->with('success', 'Request status updated successfully!');
-    }
 }
