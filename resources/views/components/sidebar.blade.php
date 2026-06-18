@@ -392,6 +392,32 @@
          <div class="px-3 mb-3 text-[10px] font-extrabold text-slate-400 uppercase tracking-[0.15em]">Care & Services
          </div>
          <div class="space-y-1">
+            <a href="{{ route('client.schedule') }}"
+               class="flex items-center justify-between px-3 py-2.5 rounded-[10px] {{ Request::routeIs('client.schedule') ? 'bg-theme-primary text-white shadow-md' : 'text-theme-muted hover:bg-theme-hover' }} transition-all group">
+               <div class="flex items-center gap-3">
+                  <svg
+                     class="w-[18px] h-[18px] {{ Request::routeIs('client.schedule') ? 'text-white' : 'text-slate-400 group-hover:text-slate-600' }}"
+                     fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                     <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                     <line x1="16" y1="2" x2="16" y2="6"></line>
+                     <line x1="8" y1="2" x2="8" y2="6"></line>
+                     <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                  <span class="text-[13.5px] font-bold">Upcoming Schedule</span>
+               </div>
+            </a>
+            <a href="{{ route('client.visits') }}"
+               class="flex items-center justify-between px-3 py-2.5 rounded-[10px] {{ Request::routeIs('client.visits') ? 'bg-theme-primary text-white shadow-md' : 'text-theme-muted hover:bg-theme-hover' }} transition-all group">
+               <div class="flex items-center gap-3">
+                  <svg
+                     class="w-[18px] h-[18px] {{ Request::routeIs('client.visits') ? 'text-white' : 'text-slate-400 group-hover:text-slate-600' }}"
+                     fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                     <circle cx="12" cy="12" r="10"></circle>
+                     <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  <span class="text-[13.5px] font-bold">Service History</span>
+               </div>
+            </a>
             <a href="{{ route('client.care-plan') }}"
                class="flex items-center justify-between px-3 py-2.5 rounded-[10px] {{ Request::routeIs('client.care-plan') ? 'bg-theme-primary text-white shadow-md' : 'text-theme-muted hover:bg-theme-hover' }} transition-all group">
                <div class="flex items-center gap-3">
