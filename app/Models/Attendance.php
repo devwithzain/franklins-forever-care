@@ -10,6 +10,7 @@ class Attendance extends Model
         'employee_id',
         'service_booking_id',
         'client_id',
+        'patient_id',
         'check_in',
         'check_out',
         'status',
@@ -40,5 +41,10 @@ class Attendance extends Model
     public function client()
     {
         return $this->belongsTo(Client::class);
+    }
+
+    public function patient()
+    {
+        return $this->belongsTo(Patient::class);
     }
 }

@@ -30,6 +30,7 @@ class ServiceBooking extends Model
         'subscription_status',
         'subscription_ends_at',
         'user_id',
+        'patient_id',
         'agent_id',
         'booking_date',
     ];
@@ -48,6 +49,11 @@ class ServiceBooking extends Model
     public function service()
     {
         return $this->belongsTo(Service::class);
+    }
+
+    public function patient()
+    {
+        return $this->belongsTo(Patient::class);
     }
 
     public function agent()

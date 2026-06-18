@@ -17,22 +17,23 @@ class AttendanceObserver
 
     protected function verifyLocation(Attendance $attendance): void
     {
-        $client = $attendance->client;
+        // Now verifying location against the Patient (where the care is received)
+        $patient = $attendance->patient;
 
-        if (!$client) {
+        if (!$patient) {
             return;
         }
 
-        $thresholdMiles = 0.5; // Max allowed distance to client home
+        $thresholdMiles = 0.5; // Max allowed distance to patient home
         $needsReview = false;
 
         // Verify Check-in
-        if ($attendance->check_in_latitude && $attendance->check_in_longitude && $client->latitude && $client->longitude) {
+        if ($attendance->check_in_latitude && $attendance->check_in_longitude && $patient->latitude && $patient->longitude) {
             $distanceIn = DistanceCalculatorService::calculateDistanceInMiles(
                 $attendance->check_in_latitude,
                 $attendance->check_in_longitude,
-                $client->latitude,
-                $client->longitude
+                $patient->latitude,
+                $patient->longitude
             );
             $attendance->check_in_distance_to_client = $distanceIn;
 
@@ -42,12 +43,12 @@ class AttendanceObserver
         }
 
         // Verify Check-out
-        if ($attendance->check_out_latitude && $attendance->check_out_longitude && $client->latitude && $client->longitude) {
+        if ($attendance->check_out_latitude && $attendance->check_out_longitude && $patient->latitude && $patient->longitude) {
             $distanceOut = DistanceCalculatorService::calculateDistanceInMiles(
                 $attendance->check_out_latitude,
                 $attendance->check_out_longitude,
-                $client->latitude,
-                $client->longitude
+                $patient->latitude,
+                $patient->longitude
             );
             $attendance->check_out_distance_to_client = $distanceOut;
 

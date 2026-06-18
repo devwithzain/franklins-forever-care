@@ -26,9 +26,10 @@ class AttendanceDistanceVerificationTest extends TestCase
         ]);
 
         $clientUser = User::factory()->create(['role' => 'client']);
-        $client = Client::create([
+
+        $patient = \App\Models\Patient::create([
             'user_id' => $clientUser->id,
-            'client_custom_id' => 'CLI-123',
+            'name' => 'John Doe',
             'latitude' => 40.7128, // NY
             'longitude' => -74.0060
         ]);
@@ -37,6 +38,7 @@ class AttendanceDistanceVerificationTest extends TestCase
         $booking = ServiceBooking::create([
             'service_id' => $service->id,
             'user_id' => $clientUser->id,
+            'patient_id' => $patient->id,
             'plan_type' => 'Hourly',
             'patient_name' => 'John Doe',
             'patient_age' => '50',
@@ -49,7 +51,7 @@ class AttendanceDistanceVerificationTest extends TestCase
 
         $attendance = Attendance::create([
             'employee_id' => $employee->id,
-            'client_id' => $client->id,
+            'patient_id' => $patient->id,
             'service_booking_id' => $booking->id,
             'check_in' => Carbon::now(),
             'check_in_latitude' => 40.7129, // Very close
@@ -71,9 +73,10 @@ class AttendanceDistanceVerificationTest extends TestCase
         ]);
 
         $clientUser = User::factory()->create(['role' => 'client']);
-        $client = Client::create([
+
+        $patient = \App\Models\Patient::create([
             'user_id' => $clientUser->id,
-            'client_custom_id' => 'CLI-124',
+            'name' => 'John Doe',
             'latitude' => 40.7128, // NY
             'longitude' => -74.0060
         ]);
@@ -82,6 +85,7 @@ class AttendanceDistanceVerificationTest extends TestCase
         $booking = ServiceBooking::create([
             'service_id' => $service->id,
             'user_id' => $clientUser->id,
+            'patient_id' => $patient->id,
             'plan_type' => 'Hourly',
             'patient_name' => 'John Doe',
             'patient_age' => '50',
@@ -94,7 +98,7 @@ class AttendanceDistanceVerificationTest extends TestCase
 
         $attendance = Attendance::create([
             'employee_id' => $employee->id,
-            'client_id' => $client->id,
+            'patient_id' => $patient->id,
             'service_booking_id' => $booking->id,
             'check_in' => Carbon::now(),
             'check_in_latitude' => 40.8128, // Far away

@@ -8,6 +8,7 @@ class Complaint extends Model
 {
     protected $fillable = [
         'client_id',
+        'patient_id',
         'employee_id',
         'subject',
         'description',
@@ -24,6 +25,11 @@ class Complaint extends Model
     public function employee()
     {
         return $this->belongsTo(User::class, 'employee_id');
+    }
+
+    public function patient()
+    {
+        return $this->belongsTo(Patient::class);
     }
 
     public function resolver()
