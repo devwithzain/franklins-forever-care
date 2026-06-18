@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use App\Services\NotificationService;
+use App\Models\Attendance;
+use App\Observers\AttendanceObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -13,6 +15,8 @@ class AppServiceProvider extends ServiceProvider
     }
     public function boot(): void
     {
+        Attendance::observe(AttendanceObserver::class);
+
         \Illuminate\Support\Facades\View::composer('components.sidebar', function ($view) {
             if (auth()->check() && auth()->user()->role === 'admin') {
                 $view->with([
