@@ -10,6 +10,7 @@ class Attendance extends Model
         'employee_id',
         'service_booking_id',
         'client_id',
+        'patient_id',
         'check_in',
         'check_out',
         'status',
@@ -18,6 +19,8 @@ class Attendance extends Model
         'check_in_longitude',
         'check_out_latitude',
         'check_out_longitude',
+        'check_in_distance_to_client',
+        'check_out_distance_to_client',
     ];
 
     protected $casts = [
@@ -38,5 +41,10 @@ class Attendance extends Model
     public function client()
     {
         return $this->belongsTo(Client::class);
+    }
+
+    public function patient()
+    {
+        return $this->belongsTo(Patient::class);
     }
 }

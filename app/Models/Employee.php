@@ -15,6 +15,11 @@ class Employee extends Model
         'type',
         'rating',
         'status',
+        'skills',
+        'certifications',
+        'languages',
+        'service_areas',
+        'availability',
     ];
 
     public function user()

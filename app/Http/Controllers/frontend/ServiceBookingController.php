@@ -123,6 +123,22 @@ class ServiceBookingController extends Controller
                 in_array($subscription->status, ['active', 'trialing']) &&
                 $paymentIntent->status === 'succeeded'
             ) {
+                $patient = \App\Models\Patient::firstOrCreate(
+                    [
+                        'user_id' => $user->id,
+                        'name' => $validated['patient_name'],
+                    ],
+                    [
+                        'age' => $validated['patient_age'],
+                        'relationship' => $validated['relationship'],
+                        'address' => $validated['address'],
+                        'city' => $validated['city'],
+                        'state' => $validated['state'],
+                        'zip_code' => $validated['zip_code'],
+                        'care_plan' => $validated['plan_type'],
+                    ]
+                );
+
                 $booking->update([
                     'payment_status' => 'paid',
                     'status' => 'confirmed',
@@ -131,6 +147,7 @@ class ServiceBookingController extends Controller
                     'stripe_session_id' => $paymentIntent->id,
                     'subscription_status' => 'active',
                     'booking_date' => $validated['preferred_date'] ?? now(),
+                    'patient_id' => $patient->id,
                 ]);
 
                 $this->createOrUpdateClient($user, $booking);
@@ -255,9 +272,8 @@ class ServiceBookingController extends Controller
             [
                 'client_custom_id' => 'C-' . rand(1000, 9999),
                 'phone' => 'N/A',
-                'region' => $booking->city . ', ' . $booking->state,
-                'care_plan' => $booking->plan_type,
-                'status' => 'Pending',
+                // The client profile should be the account holder profile, not specifically the patient's care plan
+                'status' => 'Active',
             ]
         );
     }
