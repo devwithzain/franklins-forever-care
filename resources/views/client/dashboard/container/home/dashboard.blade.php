@@ -8,6 +8,15 @@
             </p>
         </div>
         <div class="flex gap-3">
+            @if(Auth::user()->stripe_customer_id)
+                <a href="{{ route('stripe.portal') }}"
+                    class="px-5 py-2.5 bg-theme-card border border-theme-border text-theme-main rounded-[10px] text-[13px] font-bold shadow-md hover:bg-theme-hover transition-all flex items-center gap-2">
+                    <svg class="w-4.5 h-4.5 text-theme-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                    </svg>
+                    Manage Billing
+                </a>
+            @endif
             <a href="{{ route('client.requests.index') }}"
                 class="px-5 py-2.5 bg-theme-primary text-white rounded-[10px] text-[13px] font-bold shadow-md hover:bg-theme-primary-hover transition-all">+ New Request</a>
         </div>

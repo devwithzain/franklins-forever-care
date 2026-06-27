@@ -12,6 +12,7 @@ return new class extends Migration {
             $table->string('subject');
             $table->text('description');
             $table->foreignId('client_id')->constrained()->onDelete('cascade');
+            $table->foreignId('patient_id')->nullable()->constrained('patients')->nullOnDelete();
             $table->enum('status', ['Pending', 'Resolved'])->default('Pending');
             $table->enum('priority', ['Low', 'Medium', 'High'])->default('Medium');
             $table->foreignId('resolved_by')->nullable()->constrained('users')->nullOnDelete();

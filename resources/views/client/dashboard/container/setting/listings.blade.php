@@ -172,6 +172,22 @@
                     </div>
                 </div>
             </div>
+
+            @if(Auth::user()->stripe_customer_id)
+                <div class="bg-theme-card rounded-[14px] border border-theme-border p-6 shadow-sm mt-5">
+                    <h3 class="text-[14.5px] font-bold text-theme-text-main mb-4">Billing & Subscriptions</h3>
+                    <p class="text-[12px] text-theme-text-muted mb-4 leading-relaxed">
+                        Update your credit card details, view invoices, download payment receipts, and manage your recurring care plans.
+                    </p>
+                    <a href="{{ route('stripe.portal') }}"
+                        class="w-full py-2.5 bg-[#1a3cdc] hover:bg-[#1230b0] text-white rounded-lg text-[12px] font-bold shadow-md transition-all flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                        Manage Billing Portal
+                    </a>
+                </div>
+            @endif
         </div>
     </div>
     <script>

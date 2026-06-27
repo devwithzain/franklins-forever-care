@@ -1,7 +1,7 @@
 @extends('layouts.auth')
 @section('title', 'OTP Verification')
 @section('auth-content')
-    <div class="bg-theme-bg min-h-screen flex items-center justify-center relative">
+    <div class="min-h-screen flex items-center justify-center relative">
         <div
             class="fixed top-[-120px] left-[-120px] w-[400px] h-[400px] bg-[radial-gradient(circle,rgba(26,60,220,0.12)_0%,transparent_70%)] rounded-full pointer-events-none">
         </div>

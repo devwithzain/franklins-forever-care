@@ -79,6 +79,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/service-checkout/{slug}', [ServiceBookingController::class, 'checkout'])->name('service.checkout');
     Route::post('/service-checkout', [ServiceBookingController::class, 'store'])->name('service.booking.store');
+    Route::post('/service-booking/{id}/confirm', [ServiceBookingController::class, 'confirmBooking'])->name('service.booking.confirm');
+    Route::get('/stripe/portal', [ServiceBookingController::class, 'portal'])->name('stripe.portal');
     Route::get('/service-booking/success/{id}', [ServiceBookingController::class, 'success'])->name('service.booking.success');
     Route::get('/service-booking/cancel/{id}', [ServiceBookingController::class, 'cancel'])->name('service.booking.cancel');
     Route::post('/service-booking/{id}/cancel-subscription', [ServiceBookingController::class, 'cancelSubscription'])->name('service.booking.cancel-subscription');

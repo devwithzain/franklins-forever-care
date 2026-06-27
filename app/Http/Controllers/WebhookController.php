@@ -30,6 +30,7 @@ class WebhookController extends Controller
         match ($event->type) {
             'invoice.payment_succeeded'      => $this->handlePaymentSucceeded($event->data->object),
             'invoice.payment_failed'         => $this->handlePaymentFailed($event->data->object),
+            'customer.subscription.updated'  => $this->handleSubscriptionUpdated($event->data->object),
             'customer.subscription.deleted'  => $this->handleSubscriptionCancelled($event->data->object),
             default                          => null,
         };
@@ -59,11 +60,32 @@ class WebhookController extends Controller
         }
     }
 
+    private function handleSubscriptionUpdated($subscription): void
+    {
+        $booking = ServiceBooking::where('stripe_subscription_id', $subscription->id)->first();
+        if ($booking) {
+            $endsAt = null;
+            if ($subscription->cancel_at) {
+                $endsAt = \Carbon\Carbon::createFromTimestamp($subscription->cancel_at);
+            } elseif ($subscription->cancel_at_period_end && $subscription->current_period_end) {
+                $endsAt = \Carbon\Carbon::createFromTimestamp($subscription->current_period_end);
+            }
+
+            $booking->update([
+                'subscription_status' => $subscription->status,
+                'subscription_ends_at' => $endsAt,
+            ]);
+        }
+    }
+
     private function handleSubscriptionCancelled($subscription): void
     {
         $booking = ServiceBooking::where('stripe_subscription_id', $subscription->id)->first();
         if ($booking) {
-            $booking->update(['subscription_status' => 'cancelled']);
+            $booking->update([
+                'subscription_status' => 'cancelled',
+                'subscription_ends_at' => now(),
+            ]);
         }
     }
 }

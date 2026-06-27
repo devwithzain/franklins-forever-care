@@ -13,7 +13,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 </head>
 
-<body class="bg-theme-bg text-theme-text-main transition-colors duration-300">
+<body class="relative text-theme-text-main transition-colors duration-300">
+    <img src="{{ asset('assets/her-banner-bg.png') }}" alt="" class="w-full h-full absolute inset-0 object-cover">
     @yield('auth-content')
     <script src="https://unpkg.com/alpinejs" defer></script>
     <script>

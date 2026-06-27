@@ -19,6 +19,21 @@
                             <form id="payment-form" action="{{ route('service.booking.store') }}" method="POST"
                                 class="space-y-6">
                                 @csrf
+                                <div id="ajax-error-container" class="hidden bg-red-50 border-l-4 border-red-400 p-4 mb-6">
+                                    <div class="flex">
+                                        <div class="flex-shrink-0">
+                                            <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd"
+                                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                                    clip-rule="evenodd" />
+                                            </svg>
+                                        </div>
+                                        <div class="ml-3">
+                                            <p id="ajax-error-message" class="text-sm text-red-700"></p>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 @if(session('error'))
                                     <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
                                         <div class="flex">
@@ -274,33 +289,105 @@
             const buttonText = document.getElementById('button-text');
             const spinner = document.getElementById('spinner');
             const arrowIcon = document.getElementById('arrow-icon');
+            const errorContainer = document.getElementById('ajax-error-container');
+            const errorMessage = document.getElementById('ajax-error-message');
+
+            // Reset error state
+            errorContainer.classList.add('hidden');
+            errorMessage.textContent = '';
 
             submitButton.disabled = true;
             buttonText.textContent = 'Processing...';
             spinner.classList.remove('hidden');
             arrowIcon.classList.add('hidden');
 
+            // 1. Create Payment Method
             const { paymentMethod, error } = await stripe.createPaymentMethod(
                 'card', card, {
-                billing_details: { name: document.querySelector('input[name="patient_name"]').value }
+                billing_details: { 
+                    name: document.querySelector('input[name="patient_name"]').value 
+                }
             }
             );
 
             if (error) {
-                const errorElement = document.getElementById('card-errors');
-                errorElement.textContent = error.message;
+                showError(error.message);
+                return;
+            }
+
+            // 2. Gather form data
+            const formData = new FormData(form);
+            const data = {};
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
+            data['payment_method_id'] = paymentMethod.id;
+
+            try {
+                // 3. Post to store endpoint
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.error || result.message || 'Payment initiation failed.');
+                }
+
+                // 4. Handle requires_action / 3D Secure
+                if (result.requires_action) {
+                    const confirmResult = await stripe.confirmCardPayment(result.payment_intent_client_secret);
+
+                    if (confirmResult.error) {
+                        showError(confirmResult.error.message);
+                    } else if (confirmResult.paymentIntent.status === 'succeeded') {
+                        // Confirm with backend to finalize order
+                        const confirmResponse = await fetch(`/service-booking/${result.booking_id}/confirm`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify({
+                                phone: data.phone
+                            })
+                        });
+
+                        const confirmResultData = await confirmResponse.json();
+
+                        if (!confirmResponse.ok) {
+                            throw new Error(confirmResultData.error || 'Booking confirmation failed.');
+                        }
+
+                        window.location.href = confirmResultData.redirect_url;
+                    } else {
+                        showError('Payment authentication failed. Please try again.');
+                    }
+                } else {
+                    // Success immediate redirect
+                    window.location.href = result.redirect_url;
+                }
+
+            } catch (err) {
+                showError(err.message);
+            }
+
+            function showError(msg) {
+                errorMessage.textContent = msg;
+                errorContainer.classList.remove('hidden');
 
                 submitButton.disabled = false;
                 buttonText.textContent = 'Complete Request & Pay';
                 spinner.classList.add('hidden');
                 arrowIcon.classList.remove('hidden');
-            } else {
-                const hiddenInput = document.createElement('input');
-                hiddenInput.setAttribute('type', 'hidden');
-                hiddenInput.setAttribute('name', 'payment_method_id');
-                hiddenInput.setAttribute('value', paymentMethod.id);
-                form.appendChild(hiddenInput);
-                form.submit();
             }
         });
     </script>
