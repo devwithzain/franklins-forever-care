@@ -88,7 +88,7 @@
                     <tbody class="divide-y divide-theme-border text-theme-main">
                         @forelse($bookings as $booking)
                             <tr class="hover:bg-theme-hover transition-colors">
-                                <td class="px-6 py-4 font-semibold">{{ $booking->service->title }}</td>
+                                <td class="px-6 py-4 font-semibold">{{ $booking->service->title ?? $booking->service->name ?? 'Service Booking' }}</td>
                                 <td class="px-6 py-4 text-theme-muted capitalize">{{ $booking->plan_type }}</td>
                                 <td class="px-6 py-4 font-bold text-theme-primary">${{ number_format($booking->amount, 2) }}</td>
                                 <td class="px-6 py-4">

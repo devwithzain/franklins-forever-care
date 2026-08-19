@@ -12,13 +12,16 @@
         @forelse($activeBookings as $booking)
             <div class="bg-theme-card border border-theme-border rounded-[14px] shadow-sm overflow-hidden">
                 <div class="px-6 py-5 border-b border-theme-border flex items-center justify-between bg-theme-hover/50">
+                    @php
+                        $serviceTitle = $booking->service->title ?? $booking->service->name ?? 'Care Service';
+                    @endphp
                     <div class="flex items-center gap-4">
                         <div
                             class="w-10 h-10 rounded-full bg-theme-primary text-white flex items-center justify-center font-bold">
-                            {{ strtoupper(substr($booking->service->title, 0, 1)) }}
+                            {{ strtoupper(substr($serviceTitle, 0, 1)) }}
                         </div>
                         <div>
-                            <h3 class="text-[15px] font-extrabold text-theme-main">{{ $booking->service->title }}</h3>
+                            <h3 class="text-[15px] font-extrabold text-theme-main">{{ $serviceTitle }}</h3>
                             <p class="text-[11px] text-theme-muted uppercase tracking-widest font-bold">
                                 {{ $booking->plan_type }} Plan</p>
                         </div>
@@ -28,7 +31,7 @@
                             class="px-3 py-1 rounded-full bg-green-100 text-green-700 text-[10px] font-black uppercase">Active</span>
                     </div>
                 </div>
-                <div class="p-6 grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="p-6 grid sm:grid-cols-1 grid-cols-4 gap-8">
                     <div>
                         <h4 class="text-[11px] font-bold text-theme-muted uppercase mb-2">Patient Details</h4>
                         <p class="text-[14px] font-bold text-theme-main">{{ $booking->patient_name }}</p>

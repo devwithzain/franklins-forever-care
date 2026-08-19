@@ -22,12 +22,12 @@ class ClientHomePageController extends Controller
         $clientRecord = Client::with('agent')->where('user_id', $user->id)->first();
 
         $requests = ClientRequest::where('client_id', $clientRecord->id ?? 0)->latest()->take(5)->get();
-        $bookings = ServiceBooking::where('user_id', $user->id)->latest()->take(5)->get();
+        $bookings = ServiceBooking::with('service')->where('user_id', $user->id)->latest()->take(5)->get();
 
         $stats = [
             'total_requests' => ClientRequest::where('client_id', $clientRecord->id ?? 0)->count(),
             'total_bookings' => ServiceBooking::where('user_id', $user->id)->count(),
-            'active_plan' => ServiceBooking::where('user_id', $user->id)->where('status', 'confirmed')->first(),
+            'active_plan' => ServiceBooking::with('service')->where('user_id', $user->id)->where('status', 'confirmed')->first(),
         ];
 
         return view('client.dashboard.container.home.dashboard', [

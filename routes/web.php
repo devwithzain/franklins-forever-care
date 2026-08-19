@@ -37,6 +37,7 @@ use App\Http\Controllers\frontend\ServicesController;
 use App\Http\Controllers\frontend\BlogDetailController;
 use App\Http\Controllers\frontend\ServiceDetailController;
 use App\Http\Controllers\frontend\ServiceBookingController;
+use App\Http\Controllers\frontend\TeamController;
 
 // Root route - Auth Page
 Route::get('/login', [AuthenticatedSessionController::class, 'create'])
@@ -71,6 +72,8 @@ Route::get('/blog/{slug}', [BlogDetailController::class, 'index'])->name('blog-d
 Route::get('/privacy-policy', [PageController::class, 'privacy'])->name('privacy-policy');
 Route::get('/terms-conditions', [PageController::class, 'terms'])->name('terms-conditions');
 Route::get('/service/{slug}', [ServiceDetailController::class, 'index'])->name('service-detail');
+Route::get('/team', [TeamController::class, 'index'])->name('team.index');
+Route::get('/team/{id}', [TeamController::class, 'show'])->name('team.show');
 
 // Service Booking / Checkout routes (Authenticated)
 Route::middleware(['auth'])->group(function () {
