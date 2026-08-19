@@ -1,4 +1,4 @@
-@extends('layouts.client')
+@extends('layouts.user')
 @section('title', 'Service History & Visit Logs')
 @section('client-content')
 <div class="mb-8">

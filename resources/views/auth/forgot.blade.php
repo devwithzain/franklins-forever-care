@@ -14,7 +14,10 @@
                 class="bg-theme-card rounded-[14px] border border-theme-border shadow-[0_4px_24px_rgba(26,60,220,0.12)] p-9">
                 <div class="mb-7">
                     <div class="w-full flex items-center justify-center mb-5">
-                        <img class="w-60 h-auto object-cover" src="{{ asset('assets/logo.png') }}" alt="Logo">
+                          <img class="w-80 h-auto object-cover block dark:hidden" src="{{ asset('assets/logo.png') }}"
+                            alt="Logo">
+                        <img class="w-80 h-auto object-cover hidden dark:block"
+                            src="{{ asset('assets/logoDark.png') }}" alt="Logo">
                     </div>
                     <div class="text-[22px] font-bold text-theme-text-main">Forgot Password?</div>
                     <div class="text-[13px] text-[#64748b] mt-1">No worries, we'll send you an OTP to reset it.</div>
@@ -42,7 +45,7 @@
                                 </svg>
                             </span>
                             <input
-                                class="w-full pl-9 pr-3.5 py-2.5 border-[1.5px] border-[#e2e8f0] rounded-[9px] text-[13.5px] text-[#1e293b] bg-white outline-none transition focus:border-[#1a3cdc] focus:shadow-[0_0_0_3px_rgba(26,60,220,0.08)] placeholder-[#64748b]"
+                                class="w-full pl-9 pr-3.5 py-2.5 border-[1.5px] border-theme-border rounded-[9px] text-[13.5px] text-theme-text-main bg-theme-card outline-none transition focus:border-theme-primary focus:ring-2 focus:ring-theme-primary-light placeholder:text-theme-text-muted"
                                 type="email" id="email" name="email" value="{{ old('email') }}"
                                 placeholder="you@example.com" required autofocus />
                         </div>

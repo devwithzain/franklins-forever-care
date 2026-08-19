@@ -1,4 +1,4 @@
-@extends('layouts.client')
+@extends('layouts.user')
 @section('title', 'Upcoming Schedule')
 @section('client-content')
 <div class="mb-8">

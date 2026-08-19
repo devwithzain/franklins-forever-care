@@ -20,7 +20,7 @@
         class="bg-theme-card rounded-[14px] border border-theme-border shadow-sm overflow-hidden text-theme-text-main">
         <form action="{{ route('admin.clients.store') }}" method="POST" class="p-8">
             @csrf
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid sm:grid-cols-1 grid-cols-2 gap-6">
                 <!-- Name -->
                 <div class="space-y-1.5">
                     <label class="text-[13px] font-bold text-theme-text-main">Full Name</label>

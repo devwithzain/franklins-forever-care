@@ -73,7 +73,7 @@
                   300K+ People
                </h2>
                <p class="smallParagraph text-[#666666] font-medium leading-normal">
-                  Individuals who have trusted <br> Oldero services
+                  Individuals who have trusted <br> Franklin's services
                </p>
             </div>
          </div>

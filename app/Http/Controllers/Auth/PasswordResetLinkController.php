@@ -29,8 +29,13 @@ class PasswordResetLinkController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        $email = strtolower(trim($request->email ?? ''));
+        $request->merge(['email' => $email]);
+
         $request->validate([
             'email' => ['required', 'email', 'exists:users,email'],
+        ], [
+            'email.exists' => 'No account found with this email address.',
         ]);
 
         // Generate 6-digit OTP
@@ -38,7 +43,7 @@ class PasswordResetLinkController extends Controller
 
         // Store OTP in database
         DB::table('otps')->updateOrInsert(
-            ['email' => $request->email],
+            ['email' => $email],
             [
                 'code' => $otp,
                 'expires_at' => now()->addMinutes(10),
@@ -48,18 +53,27 @@ class PasswordResetLinkController extends Controller
         );
 
         // Send Email
-        Mail::to($request->email)->send(new ForgotPasswordOtpMail($otp));
+        try {
+            Mail::to($email)->send(new ForgotPasswordOtpMail($otp));
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Failed to send OTP mail: ' . $e->getMessage());
+        }
 
-        return redirect()->route('password.verify-otp-view', ['email' => $request->email]);
+        return redirect()->route('password.verify-otp-view', ['email' => $email])
+            ->with('status', 'An OTP code has been sent to your email address.');
     }
 
     public function verifyOtpView(Request $request): View
     {
-        return view('auth.verify-otp', ['email' => $request->email]);
+        $email = strtolower(trim($request->query('email', session('email', ''))));
+        return view('auth.verify-otp', ['email' => $email]);
     }
 
     public function verifyOtp(Request $request): RedirectResponse
     {
+        $email = strtolower(trim($request->email ?? ''));
+        $request->merge(['email' => $email]);
+
         $request->validate([
             'email' => ['required', 'email', 'exists:users,email'],
             'otp' => ['required', 'array', 'size:6'],
@@ -68,25 +82,25 @@ class PasswordResetLinkController extends Controller
         $otpCode = implode('', $request->otp);
 
         $record = DB::table('otps')
-            ->where('email', $request->email)
+            ->where('email', $email)
             ->where('code', $otpCode)
             ->where('expires_at', '>', now())
             ->first();
 
         if (!$record) {
-            return back()->withErrors(['otp' => 'Invalid or expired OTP code.']);
+            return back()->withInput(['email' => $email])->withErrors(['otp' => 'Invalid or expired OTP code.']);
         }
 
-        // Generate a temporary token for the reset page (mimicking Laravel's behavior)
+        // Generate a temporary token for the reset page
         $token = Str::random(64);
         DB::table('password_reset_tokens')->updateOrInsert(
-            ['email' => $request->email],
+            ['email' => $email],
             ['token' => \Hash::make($token), 'created_at' => now()]
         );
 
         // Delete OTP after verification
-        DB::table('otps')->where('email', $request->email)->delete();
+        DB::table('otps')->where('email', $email)->delete();
 
-        return redirect()->route('password.reset', ['token' => $token, 'email' => $request->email]);
+        return redirect()->route('password.reset', ['token' => $token, 'email' => $email]);
     }
 }

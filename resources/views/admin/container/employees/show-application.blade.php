@@ -24,7 +24,7 @@
         </span>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+    <div class="grid sm:grid-cols-1 grid-cols-2 gap-5 mb-6">
         <div class="bg-theme-bg rounded-lg p-4 border border-theme-border">
             <div class="text-[12px] font-bold text-theme-text-muted uppercase tracking-widest mb-2">Personal
                 Information</div>

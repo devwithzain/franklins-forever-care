@@ -13,7 +13,10 @@
                 class="bg-theme-card rounded-[14px] border border-theme-border shadow-[0_4px_24px_rgba(26,60,220,0.12)] p-9">
                 <div class="mb-7">
                     <div class="w-full flex items-center justify-center mb-5">
-                        <img class="w-60 h-auto object-cover" src="{{ asset('assets/logo.png') }}" alt="Logo">
+                        <img class="w-80 h-auto object-cover block dark:hidden" src="{{ asset('assets/logo.png') }}"
+                            alt="Logo">
+                        <img class="w-80 h-auto object-cover hidden dark:block"
+                            src="{{ asset('assets/logoDark.png') }}" alt="Logo">
                     </div>
                     <div class="text-[22px] font-bold text-theme-text-main">Welcome Back</div>
                     <div class="text-[13px] text-theme-text-muted mt-1">Sign in to your account</div>
@@ -24,12 +27,23 @@
                         @foreach ($errors->all() as $error)
                             <div>{{ $error }}</div>
                         @endforeach
-                </div> @endif @if (session('status'))
+                        @if (str_contains(implode(' ', $errors->all()), 'verified') && old('email'))
+                            <form method="POST" action="{{ route('verification.resend') }}" class="mt-2">
+                                @csrf
+                                <input type="hidden" name="email" value="{{ old('email') }}">
+                                <button type="submit" class="text-[12px] font-bold text-theme-primary hover:underline bg-transparent border-none p-0 cursor-pointer">
+                                    Click here to resend verification email
+                                </button>
+                            </form>
+                        @endif
+                    </div>
+                @endif
+                @if (session('status'))
                     <div
-                        class="bg-green-100 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-[9px] p-3
-                                                                                                                                                                                                                                                                text-[13px] text-green-700 dark:text-green-400 mb-4">
+                        class="bg-green-100 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-[9px] p-3 text-[13px] text-green-700 dark:text-green-400 mb-4">
                         {{ session('status') }}
-                </div> @endif <form method="POST" action="{{ route('login.store') }}">
+                    </div>
+                @endif <form method="POST" action="{{ route('login.store') }}">
                     @csrf
                     <div class="mb-4">
                         <label class="block text-[13px] font-semibold text-theme-text-main mb-1.5" for="email">Email

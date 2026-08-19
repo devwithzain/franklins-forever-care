@@ -109,14 +109,17 @@
 
    <!-- Send Broadcast -->
    <div>
-      <div class="bg-white rounded-[14px] border border-slate-200 p-6 shadow-sm">
-         <h3 class="text-[14.5px] font-bold text-slate-800 mb-6">Send Quick Broadcast</h3>
-         <form action="{{ route('admin.notifications.broadcast') }}" method="POST" class="space-y-4">
+      <div class="bg-theme-card rounded-[14px] border border-theme-border overflow-hidden shadow-sm">
+         <div class="px-6 py-5 border-b border-theme-border flex items-center justify-between">
+            <h3 class="text-[15px] font-extrabold text-theme-text-main">Send Quick Broadcast</h3>
+         </div>
+         <form action="{{ route('admin.notifications.broadcast') }}" method="POST" class="space-y-4 p-6">
             @csrf
             <div>
-               <label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest block mb-2">Audience</label>
+               <label
+                  class="text-[11px] font-bold text-theme-text-muted uppercase tracking-widest block mb-2">Audience</label>
                <select name="audience"
-                  class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-[13px] font-medium outline-none">
+                  class="w-full bg-theme-card border border-theme-border rounded-lg px-4 py-2 text-[13px] font-medium outline-none">
                   <option value="all">All Users</option>
                   <option value="client">Clients Only</option>
                   <option value="employee">Agents Only</option>
@@ -124,9 +127,10 @@
                </select>
             </div>
             <div>
-               <label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest block mb-2">Message</label>
+               <label
+                  class="text-[11px] font-bold text-theme-text-muted uppercase tracking-widest block mb-2">Message</label>
                <textarea name="message" required
-                  class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-[13px] h-32 outline-none focus:border-[#1a3cdc]"
+                  class="w-full bg-theme-card border border-theme-border rounded-lg px-4 py-3 text-[13px] h-32 outline-none focus:border-[#1a3cdc]"
                   placeholder="Type your broadcast message..."></textarea>
             </div>
             <button type="submit"

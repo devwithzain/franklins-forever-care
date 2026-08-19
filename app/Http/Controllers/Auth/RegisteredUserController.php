@@ -37,10 +37,12 @@ class RegisteredUserController extends Controller
 
         event(new Registered($user));
 
-        Auth::login($user);
+        try {
+            Mail::to($user->email)->send(new RegistrationEmailMail("Welcome " . strtoupper($user->name), $user));
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Failed to send registration mail: ' . $e->getMessage());
+        }
 
-        Mail::to($user->email)->send(new RegistrationEmailMail("Welcome " . strtoupper($user->name), $user));
-
-        return redirect()->route('home');
+        return redirect()->route('login')->with('status', 'Registration successful! A verification link has been sent to your email address. Please check your inbox and verify your email before logging in.');
     }
 }

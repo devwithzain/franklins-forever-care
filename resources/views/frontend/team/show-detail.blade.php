@@ -1,6 +1,6 @@
 <section class="w-full bg-white padding-x padding-y">
    <div class="max-w-7xl mx-auto">
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+      <div class="grid sm:grid-cols-1 grid-cols-2 gap-10">
 
          {{-- LEFT: Profile Card --}}
          <div class="lg:col-span-1 flex flex-col gap-6">

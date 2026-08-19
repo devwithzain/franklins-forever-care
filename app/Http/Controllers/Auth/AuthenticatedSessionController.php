@@ -26,6 +26,15 @@ class AuthenticatedSessionController extends Controller
 
         $user = Auth::user();
 
+        if (! $user->hasVerifiedEmail()) {
+            Auth::logout();
+            return redirect()->route('login')
+                ->withInput(['email' => $request->email])
+                ->withErrors([
+                    'email' => 'Your email address is not verified. Please check your inbox and verify your email before logging in.',
+                ]);
+        }
+
         if ($user->two_factor_enabled) {
             $code = rand(100000, 999999);
 

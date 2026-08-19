@@ -94,7 +94,9 @@ class ClientHomePageController extends Controller
         $clientRecord = Client::where('user_id', $user->id)->first();
 
         if (!$clientRecord) {
-            abort(404, 'Client record not found.');
+            $visits = collect([]);
+            $reports = collect([]);
+            return view('client.dashboard.container.visits.index', compact('visits', 'reports'));
         }
 
         // Fetch attendance records that have check_out completed, showing PCA Agent details

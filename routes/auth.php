@@ -28,7 +28,16 @@ Route::middleware('guest')->group(function () {
 
     Route::post('reset-password', [NewPasswordController::class, 'store'])
         ->name('password.store');
+
+    Route::post('resend-verification', [EmailVerificationNotificationController::class, 'resend'])
+        ->middleware('throttle:6,1')
+        ->name('verification.resend');
 });
+
+// Signed verification route accessible to guests and auth users
+Route::get('verify-email/{id}/{hash}', VerifyEmailController::class)
+    ->middleware(['signed', 'throttle:6,1'])
+    ->name('verification.verify');
 
 // 2FA routes - accessible after login attempt but before full authentication
 Route::get('verify-2fa', [AuthenticatedSessionController::class, 'twoFactorView'])
@@ -40,10 +49,6 @@ Route::post('verify-2fa', [AuthenticatedSessionController::class, 'verifyTwoFact
 Route::middleware('auth')->group(function () {
     Route::get('verify-email', EmailVerificationPromptController::class)
         ->name('verification.notice');
-
-    Route::get('verify-email/{id}/{hash}', VerifyEmailController::class)
-        ->middleware(['signed', 'throttle:6,1'])
-        ->name('verification.verify');
 
     Route::post('email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
         ->middleware('throttle:6,1')

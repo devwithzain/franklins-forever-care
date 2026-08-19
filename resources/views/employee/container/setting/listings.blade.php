@@ -19,7 +19,7 @@
             class="p-6 space-y-5" enctype="multipart/form-data">
             @method('PUT')
             @csrf
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div class="grid sm:grid-cols-1 grid-cols-2 gap-5">
                <div>
                   <label class="text-[12px] font-bold text-theme-text-muted uppercase mb-2 block">Full Name</label>
                   <input name="name" value="{{ Auth::user()->name }}"
@@ -129,7 +129,7 @@
                @error('current_password') <span
                   class="text-red-500 text-[11px] font-bold mt-1 block">{{ $message }}</span> @enderror
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div class="grid sm:grid-cols-1 grid-cols-2 gap-5">
                <div>
                   <label class="text-[12px] font-bold text-theme-text-muted uppercase mb-2 block">New Password</label>
                   <input name="password" type="password"

@@ -1,69 +1,108 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Newsletter Subscription Confirmation</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f4f4;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #0b0f19;
+            color: #f8fafc;
             margin: 0;
             padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+        .wrapper {
+            width: 100%;
+            background-color: #0b0f19;
+            padding: 40px 15px;
+            box-sizing: border-box;
         }
         .container {
             max-width: 600px;
-            margin: 40px auto;
-            background-color: #ffffff;
-            border-radius: 12px;
+            margin: 0 auto;
+            background: #131b2e;
+            border: 1px solid #1e293b;
+            border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
         }
         .header {
-            background: linear-gradient(135deg, #7E80B0 0%, #5a5c8a 100%);
-            padding: 40px 30px;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            padding: 36px 30px;
             text-align: center;
+            border-bottom: 1px solid #1e293b;
         }
-        .header h1 {
-            color: #ffffff;
+        .brand-title {
+            color: #3b82f6;
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
             margin: 0;
-            font-size: 28px;
-            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .brand-subtitle {
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-top: 4px;
+            text-transform: uppercase;
         }
         .content {
-            padding: 40px 30px;
-            color: #333333;
-            line-height: 1.6;
+            padding: 40px 32px;
         }
-        .content h2 {
-            color: #7E80B0;
+        .heading {
+            color: #f8fafc;
             font-size: 22px;
-            margin-top: 0;
+            font-weight: 700;
+            margin: 0 0 12px 0;
         }
-        .content p {
-            font-size: 16px;
-            color: #666666;
-            margin-bottom: 20px;
+        .intro {
+            color: #94a3b8;
+            font-size: 14.5px;
+            line-height: 1.6;
+            margin-0 0 24px 0;
         }
-        .button {
-            display: inline-block;
-            background-color: #F0BB4C;
-            color: #000000;
-            text-decoration: none;
-            padding: 14px 32px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 16px;
+        .email-display {
+            background: #0f172a;
+            border: 1px solid #334155;
+            padding: 14px 20px;
+            border-radius: 10px;
             margin: 20px 0;
+            text-align: center;
+            font-size: 15px;
+            color: #60a5fa;
+            font-weight: 600;
         }
-        .button:hover {
-            background-color: #d8a540;
+        .confirmation-box {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 16px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .confirmation-text {
+            font-size: 14.5px;
+            color: #34d399;
+            font-weight: 600;
         }
         .features {
-            background-color: #f8f9fa;
-            padding: 25px;
-            border-radius: 8px;
-            margin: 25px 0;
+            background: #0f172a;
+            border: 1px solid #1e293b;
+            padding: 24px;
+            border-radius: 12px;
+            margin: 24px 0;
+        }
+        .features-title {
+            color: #f8fafc;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         .features ul {
             list-style: none;
@@ -71,121 +110,113 @@
             margin: 0;
         }
         .features li {
-            padding: 10px 0;
-            font-size: 15px;
-            color: #555555;
+            padding: 8px 0;
+            font-size: 14px;
+            color: #cbd5e1;
+            display: flex;
+            align-items: center;
         }
         .features li:before {
             content: "✓";
-            color: #4A9D7A;
+            color: #10b981;
             font-weight: bold;
-            margin-right: 10px;
+            margin-right: 12px;
+        }
+        .cta-center {
+            text-align: center;
+            margin: 32px 0 24px 0;
+        }
+        .btn-primary {
+            display: inline-block;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: #0f172a !important;
+            text-decoration: none;
+            padding: 14px 32px;
+            border-radius: 10px;
+            font-weight: 800;
+            font-size: 14.5px;
+            box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3);
         }
         .footer {
-            background-color: #f8f9fa;
-            padding: 30px;
+            background: #0f172a;
+            padding: 24px 30px;
             text-align: center;
-            border-top: 1px solid #e0e0e0;
+            border-top: 1px solid #1e293b;
         }
-        .footer p {
-            font-size: 13px;
-            color: #999999;
-            margin: 5px 0;
+        .footer-text {
+            color: #64748b;
+            font-size: 12px;
+            margin: 4px 0;
+            line-height: 1.5;
         }
         .social-links {
-            margin: 20px 0;
+            margin-bottom: 16px;
         }
         .social-links a {
-            display: inline-block;
-            margin: 0 8px;
-            color: #7E80B0;
+            color: #3b82f6;
             text-decoration: none;
-        }
-        .confirmation-box {
-            background-color: #d4edda;
-            border: 1px solid #c3e6cb;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 20px 0;
-            text-align: center;
-        }
-        .confirmation-text {
-            font-size: 16px;
-            color: #155724;
+            font-size: 13px;
+            margin: 0 8px;
             font-weight: 600;
-        }
-        .email-display {
-            background-color: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 20px 0;
-            text-align: center;
-            font-size: 16px;
-            color: #333333;
-            font-weight: 500;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🎉 Confirm Your Subscription!</h1>
-        </div>
-        
-        <div class="content">
-            <h2>Almost Done!</h2>
-            
-            <p>Hi {{ $subscriber->name ?? 'there' }},</p>
-            
-            <p>Thank you for your interest in Franklin's Forever Care newsletter! To complete your subscription and start receiving our updates, please confirm your email address.</p>
-            
-            <div class="email-display">
-                📧 {{ $subscriber->email }}
+    <div class="wrapper">
+        <div class="container">
+            <div class="header">
+                <img src="{{ asset('assets/logoDark.png') }}" alt="Franklin's Forever Care" style="max-width: 220px; width: 100%; height: auto; display: block; margin: 0 auto 6px auto;">
+                <div class="brand-subtitle">Newsletter Subscription</div>
             </div>
-
-            @if($subscriber->status === 'pending')
-            <div class="confirmation-box">
-                <div class="confirmation-text">
-                    ✓ Click the button below to confirm your subscription
+            
+            <div class="content">
+                <h2 class="heading">🎉 Confirm Your Subscription!</h2>
+                
+                <p class="intro">Hi <strong>{{ $subscriber->name ?? 'there' }}</strong>,</p>
+                
+                <p class="intro">Thank you for subscribing to Franklin's Forever Care newsletter! To complete your subscription and receive our latest updates, please confirm your email address.</p>
+                
+                <div class="email-display">
+                    📧 {{ $subscriber->email }}
                 </div>
+
+                @if($subscriber->status === 'pending')
+                <div class="confirmation-box">
+                    <div class="confirmation-text">
+                        ✓ Subscription pending confirmation
+                    </div>
+                </div>
+                @endif
+                
+                <div class="features">
+                    <div class="features-title">What you'll receive:</div>
+                    <ul>
+                        <li>Latest healthcare tips and wellness advice</li>
+                        <li>New service announcements & care package updates</li>
+                        <li>Exclusive promotional offers</li>
+                        <li>Expert insights from our care professionals</li>
+                        <li>Community stories and inspirational care updates</li>
+                    </ul>
+                </div>
+                
+                <div class="cta-center">
+                    <a href="{{ route('home') }}" class="btn-primary">Visit Our Website</a>
+                </div>
+                
+                <p style="color: #64748b; font-size: 13px; line-height: 1.6; margin-top: 20px;">
+                    We respect your privacy. You can unsubscribe at any time using the link in our emails.
+                </p>
             </div>
-            @endif
             
-            <p>Once confirmed, you'll receive regular updates about:</p>
-            
-            <div class="features">
-                <ul>
-                    <li>Latest healthcare tips and wellness advice</li>
-                    <li>New services and care packages</li>
-                    <li>Special offers and promotions</li>
-                    <li>Expert insights from our care professionals</li>
-                    <li>Community stories and testimonials</li>
-                </ul>
+            <div class="footer">
+                <div class="social-links">
+                    <a href="#">Facebook</a> • 
+                    <a href="#">Twitter</a> • 
+                    <a href="#">Instagram</a>
+                </div>
+                <p class="footer-text">&copy; {{ date('Y') }} Franklin's Forever Care. All rights reserved.</p>
+                <p class="footer-text">Sent to {{ $subscriber->email }}</p>
             </div>
-            
-            <p>We respect your privacy and will never share your email address with third parties. You can unsubscribe at any time by clicking the link in our emails.</p>
-            
-            <center>
-                <a href="{{ route('home') }}" class="button">Visit Our Website</a>
-            </center>
-            
-            <p>If you have any questions or need assistance, please don't hesitate to contact us at support@franklinsforevercare.com</p>
-            
-            <p>Best regards,<br>
-            <strong>The Franklin's Forever Care Team</strong></p>
-        </div>
-        
-        <div class="footer">
-            <div class="social-links">
-                <a href="#">Facebook</a> | 
-                <a href="#">Twitter</a> | 
-                <a href="#">Instagram</a>
-            </div>
-            <p>&copy; {{ date('Y') }} Franklin's Forever Care. All rights reserved.</p>
-            <p>This email was sent to {{ $subscriber->email }}</p>
-            <p style="margin-top: 15px; font-size: 11px;">
-                If you did not request this subscription, you can safely ignore this email.
-            </p>
         </div>
     </div>
 </body>

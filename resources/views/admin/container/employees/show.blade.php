@@ -18,7 +18,7 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="grid sm:grid-cols-1 grid-cols-2 gap-6">
         <div class="lg:col-span-1 space-y-6">
             <!-- Profile Card -->
             <div class="bg-theme-card rounded-[14px] border border-theme-border shadow-sm p-6 text-center">
@@ -62,7 +62,7 @@
             <!-- Professional Details -->
             <div class="bg-theme-card rounded-[14px] border border-theme-border shadow-sm p-6">
                 <h4 class="text-[14px] font-bold text-theme-text-main mb-4 border-b border-theme-border pb-3">Professional Information</h4>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid sm:grid-cols-1 grid-cols-2 gap-6">
                     <div>
                         <p class="text-[11px] font-bold text-theme-text-muted uppercase tracking-wider">Email Address</p>
                         <p class="text-[13.5px] text-theme-text-main font-bold mt-1">{{ $employee->user->email }}</p>

@@ -24,12 +24,12 @@
         </div>
     @endif
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="grid sm:grid-cols-1 grid-cols-2 gap-6">
         <!-- Details Column -->
         <div class="lg:col-span-2 space-y-6">
             <div class="bg-theme-card rounded-[14px] border border-theme-border p-6 shadow-sm">
                 <h3 class="text-sm font-bold text-theme-text-main mb-4">Subscriber Info</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid sm:grid-cols-1 grid-cols-2 gap-6">
                     <div>
                         <span class="block text-[10.5px] font-bold text-theme-text-muted uppercase tracking-wider mb-1">Email Address</span>
                         <div class="text-[14px] font-bold text-theme-text-main break-all">{{ $subscriber->email }}</div>

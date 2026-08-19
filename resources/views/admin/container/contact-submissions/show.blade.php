@@ -24,7 +24,7 @@
         </div>
     @endif
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="grid sm:grid-cols-1 grid-cols-2 gap-6">
         <!-- Inquiry Card -->
         <div class="lg:col-span-2 space-y-6">
             <div class="bg-theme-card rounded-[14px] border border-theme-border p-6 shadow-sm">

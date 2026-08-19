@@ -14,7 +14,10 @@
                 class="bg-theme-card rounded-[14px] border border-theme-border shadow-[0_4px_24px_rgba(26,60,220,0.12)] p-9">
                 <div class="mb-7">
                     <div class="w-full flex items-center justify-center mb-5">
-                        <img class="w-60 h-auto object-cover" src="{{ asset('assets/logo.png') }}" alt="Logo">
+                         <img class="w-80 h-auto object-cover block dark:hidden" src="{{ asset('assets/logo.png') }}"
+                            alt="Logo">
+                        <img class="w-80 h-auto object-cover hidden dark:block"
+                            src="{{ asset('assets/logoDark.png') }}" alt="Logo">
                     </div>
                     <div class="text-[22px] font-bold text-theme-text-main">2FA Verification</div>
                     <div class="text-[13px] text-theme-text-muted mt-1">Two-Factor Authentication is enabled. Enter the

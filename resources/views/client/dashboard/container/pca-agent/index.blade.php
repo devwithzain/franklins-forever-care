@@ -60,7 +60,7 @@
                 </div>
             </div>
             
-            <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-8 bg-theme-hover/20">
+            <div class="p-8 grid sm:grid-cols-1 grid-cols-2 gap-8 bg-theme-hover/20">
                 <div>
                     <h3 class="text-[11.5px] font-bold text-theme-muted uppercase tracking-wider mb-4">Agent Profile</h3>
                     <div class="space-y-4">

@@ -17,7 +17,7 @@
         <form action="{{ route('admin.employees.update', $employee->id) }}" method="POST" class="p-8">
             @csrf
             @method('PUT')
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid sm:grid-cols-1 grid-cols-2 gap-6">
                 <!-- Basic Info -->
                 <div class="space-y-4">
                     <h4 class="text-[14px] font-bold text-theme-text-main border-b border-theme-border pb-2">Account

@@ -15,7 +15,7 @@
     <div class="bg-theme-card rounded-[14px] border border-theme-border shadow-sm overflow-hidden">
         <form action="{{ route('admin.employees.store') }}" method="POST" class="p-8">
             @csrf
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid sm:grid-cols-1 grid-cols-2 gap-6">
                 <!-- Basic Info -->
                 <div class="space-y-4">
                     <h4 class="text-[14px] font-bold text-theme-text-main border-b border-theme-border pb-2">Account Information</h4>
